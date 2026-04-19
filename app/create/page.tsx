@@ -62,7 +62,7 @@ function CreateForm() {
     setForm(prev => ({ ...prev, [k]: e.target.value }))
 
   const canStep2 = form.sender_name && form.sender_email && form.recipient_name
-  const canStep3 = !!canStep2 && form.title && form.message.length >= 10
+  const canStep3 = !!canStep2 && form.title && form.title.length >= 1
 
   const onAudioUpload = useCallback((f: File, wave: number[]) => {
     setAudioFile(f); setAudioWave(wave)
