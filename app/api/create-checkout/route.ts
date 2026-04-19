@@ -17,7 +17,7 @@ const schema = z.object({
   recipient_name:  z.string().min(1),
   recipient_email: z.string().optional(),
   title:           z.string().min(1).max(120),
-  message:         z.string().min(10).max(2000),
+  message:         z.string().min(0).max(2000).default(''),
   audio_url:       z.string().url().optional(),
   audio_filename:  z.string().optional(),
   // JSON-serialized waveform array
