@@ -48,8 +48,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Créer le lien en base ────────────────────────────────────
-    const { nanoid } = await import('nanoid')
-    const slug = nanoid(10)
+    const slug = Math.random().toString(36).substring(2, 12)
 
     let audioWaveform: number[] | null = null
     if (meta.audio_waveform) {
