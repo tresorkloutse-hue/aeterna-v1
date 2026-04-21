@@ -73,31 +73,45 @@ export async function POST(req: NextRequest) {
   let linkId: string | null = null
   let slug = makeSlug(10)
   try {
-    const { data: link } = await db
-      .from('links')
-      .insert({
-        user_id:         userId,
-        slug,
-        title:           meta.title          || 'Sanctuaire sans titre',
-        message:         meta.message        || '',
-        protocol:        (meta.tier ?? 'essence').toUpperCase(),
-        sender_name:     meta.sender_name    || '',
-        recipient_name:  meta.recipient_name || '',
-        recipient_email: meta.recipient_email || null,
-        audio_url:       meta.audio_url      || null,
-        audio_filename:  meta.audio_filename || null,
-        status:          'active',
-        eco_trees:       2,
-      })
-      .select('id, slug')
-      .single()
-    linkId = link?.id ?? null
-    slug   = link?.slug ?? slug
-    console.log('[Webhook] Lien créé:', slug)
+    const insertRes = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/links`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`,
+          'Prefer': 'return=representation',
+        },
+        body: JSON.stringify({
+          user_id:         userId,
+          slug,
+          title:           meta.title          || 'Sanctuaire sans titre',
+          message:         meta.message        || '',
+          protocol:        (meta.tier ?? 'essence').toUpperCase(),
+          sender_name:     meta.sender_name    || '',
+          recipient_name:  meta.recipient_name || '',
+          recipient_email: meta.recipient_email || null,
+          audio_url:       meta.audio_url      || null,
+          audio_filename:  meta.audio_filename || null,
+          status:          'active',
+          eco_trees:       2,
+        }),
+      }
+    )
+    const insertData = await insertRes.json()
+    console.log('[Webhook] Insert response:', insertRes.status, JSON.stringify(insertData))
+    if (insertRes.ok && insertData[0]) {
+      linkId = insertData[0].id
+      slug   = insertData[0].slug ?? slug
+      console.log('[Webhook] Lien créé:', slug)
+    } else {
+      console.error('[Webhook] Insert failed:', insertRes.status, JSON.stringify(insertData))
+    }
   } catch (e) {
-    console.error('[Webhook] Lien error DETAILS:', JSON.stringify(e), 'Meta:', JSON.stringify(meta))
+    console.error('[Webhook] Lien error:', e)
   }
-
+  
   // ── 3. Transaction ────────────────────────────────────────────
   try {
     await db.from('transactions').insert({
