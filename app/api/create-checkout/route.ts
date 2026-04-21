@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   try {
     const body  = await req.json()
     const input = schema.parse(body)
-    const base  = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://aeterna.co'
+    const base  = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://aeterna-v1.vercel.app'
     const isDiamond = input.tier === 'diamond'
 
     // Transmettre toutes les données dans les metadata Stripe
