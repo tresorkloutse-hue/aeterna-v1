@@ -38,7 +38,7 @@ export default async function ExperiencePage({ params }: Props) {
     notFound()
   }
 
-  db.rpc('increment_link_view', { link_slug: slug }).then(() => {}).catch(() => {})
+  void db.rpc('increment_link_view', { link_slug: slug })
 
   return <ExperienceView link={link} />
 }
