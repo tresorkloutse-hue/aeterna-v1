@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     slug   = link?.slug ?? slug
     console.log('[Webhook] Lien créé:', slug)
   } catch (e) {
-    console.error('[Webhook] Lien error (non-bloquant):', e)
+    console.error('[Webhook] Lien error DETAILS:', JSON.stringify(e), 'Meta:', JSON.stringify(meta))
   }
 
   // ── 3. Transaction ────────────────────────────────────────────
