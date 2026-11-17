@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Profil : Polymatch</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex"><link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#136577">
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<a class="pm-skip" href="#contenu">Aller au contenu</a>
+<div id="pm-nav"></div>
+<main id="contenu" tabindex="-1">
+<div class="wrap" id="pm-content"><p class="empty-note">Chargement du profil...</p></div>
+</main>
+<div id="pm-footer"></div>
+<script src="outils/supabase-js-2.117.1.js"></script>
+<script src="app.js"></script>
+<script>
+const contentEl=document.getElementById("pm-content");
+function profileId(){return new URLSearchParams(window.location.search).get("id");}
+function rowList(rows,kind){if(!rows||rows.length===0)return '<p class="empty-note">Rien de publié dans cette rubrique pour l’instant.</p>';return rows.map(function(r){const href=(kind==="projet"?"projet.html?id=":"ouverture.html?id=")+r.id;const disc=(kind==="projet")?r.discipline:r.discipline_origin;const lbl=(r.status==="open")?(kind==="projet"?"ouvert":"ouverte"):"clôturé";return '<div class="list-row"><a class="title-link" href="'+href+'">'+pmEscape(r.title)+'</a><div class="meta">'+(disc?pmEscape(disc)+" · ":"")+pmFormatDate(r.created_at)+' · <span class="badge '+r.status+'">'+lbl+"</span></div></div>";}).join("");}
+(async function(){
+const session=await pmInitNav(null);
+const id=profileId();
+if(!id){contentEl.innerHTML='<p class="empty-note">Profil introuvable : le lien est incomplet. <a href="membres.html">Retour à l’annuaire</a>.</p>';return;}
+if(!session){contentEl.innerHTML='<p class="empty-note">Les profils sont réservés aux membres. <a href="connexion.html?next='+encodeURIComponent("profil-public.html?id="+id)+'">Connecte-toi</a> pour consulter celui-ci.</p>';return;}
+const pr=await client.from("profiles").select("id,full_name,discipline,university,bio,skills,availability,created_at,account_type,org_kind,country,website,contact_name,founder").eq("id",id).maybeSingle();
+const p=pr.data;
+if(pr.error||!p){contentEl.innerHTML='<p class="empty-note">Ce profil n’existe pas, ou n’a pas encore été complété. <a href="membres.html">Retour à l’annuaire</a>.</p>';return;}
+const isMe=session.user.id===p.id;
+const org=pmIsOrg(p);
+let orgFactsHtml="";
+if(org){const bits=[];if(p.discipline)bits.push(pmT("Domaines : {d}").replace("{d}",pmEscape(p.discipline)));if(p.country)bits.push(pmEscape(p.country));if(p.contact_name)bits.push(pmT("Contact : {c}").replace("{c}",pmEscape(p.contact_name)));if(p.website){const u=String(p.website);const href=/^https?:/i.test(u)?u:("https://"+u);bits.push('<a class="author-link" href="'+pmEscape(href)+'" target="_blank" rel="noopener noreferrer">Site web</a>');}orgFactsHtml=bits.length?('<p class="meta" style="margin-top:4px;">'+bits.join(" · ")+"</p>"):"";}
+
+const both=await Promise.all([client.from("projects").select("id,title,discipline,status,created_at").eq("owner_id",p.id).order("created_at",{ascending:false}),client.from("openings").select("id,title,discipline_origin,status,created_at").eq("author_id",p.id).order("created_at",{ascending:false})]);
+const projects=both[0].data;const openings=both[1].data;
+const skills=(p.skills||[]).map(function(s){return '<span class="tag">'+pmEscape(s)+"</span>";}).join("");
+const firstName=pmEscape(String(p.full_name||"").split(" ")[0]);
+contentEl.innerHTML='<p class="meta" style="margin-bottom:18px;"><a class="author-link" href="membres.html">Annuaire des membres</a></p>'
++'<div class="prof-head">'+pmAvatar(p.full_name,"big",org)+'<div class="p-id"><span class="eyebrow left">'+(org?pmOrgKind(p.org_kind):(p.discipline?pmEscape(p.discipline):"Membre"))+'</span><h1>'+pmEscape(p.full_name)+"</h1>"+(org?'<p style="margin:6px 0 0;"><span class="org-badge">Institution</span></p>':"")+(p.founder?'<p style="margin:8px 0 0;"><span class="pm-fondateur grand">'+pmT("Fondateur de Polymatch")+'</span></p>':"")+((!org&&p.university)?'<p class="meta">'+pmEscape(p.university)+"</p>":"")+"</div></div>"+orgFactsHtml
++((!org&&p.availability)?'<p class="meta">'+pmT("Disponibilité annoncée : {v}").replace("{v}",pmEscape(p.availability))+"</p>":"")
++(p.bio?"<p>"+pmEscape(p.bio)+"</p>":('<p class="empty-note">'+(org?"Cette structure n’a pas encore écrit de présentation.":"Cette personne n’a pas encore écrit de présentation.")+"</p>"))
++(skills?('<p class="ex-label">'+(org?"Compétences présentes dans la structure":"Ce qu’elle sait faire")+'</p><div class="tags">')+skills+"</div>":"")
++(isMe?'<div class="cta-row left"><a class="btn accent" href="profil.html">Modifier mon profil</a><a class="btn secondary" href="membres.html">Voir les autres membres</a></div>':'<div class="cta-row left"><a class="btn accent" href="messagerie.html?to='+p.id+'">'+pmT("Écrire à {who}").replace("{who}",firstName)+'</a><a class="btn secondary" href="membres.html">Voir d’autres profils</a></div>')
++(isMe?"":'<div class="example"><div class="ex-tag">Avant d’écrire</div><p>Un premier message qui obtient une réponse tient en trois phrases : d’où tu viens, ce que tu as lu de son travail, et la chose précise que tu proposes ou que tu demandes. Par exemple : « Je suis en L3 de géographie. J’ai vu ton ouverture sur les réseaux d’entraide. J’ai des données de mobilité sur deux campus, on pourrait croiser les deux : est-ce que ça t’intéresse ? »</p></div>')
++'<div class="prof-block"><h2 class="section-title">'+(org?"Appels publiés":"Projets publiés")+'</h2>'+rowList(projects,"projet")+"</div>"
++'<div class="prof-block"><h2 class="section-title">Ouvertures proposées</h2>'+rowList(openings,"ouverture")+"</div>"
++(isMe?"":'<p class="meta" style="margin-top:24px;">Ce profil pose un problème ? '+pmReportLink("profile",p.id)+"</p>");
+pmBindReports(contentEl);
+})();
+</script>
+</body>
+</html>

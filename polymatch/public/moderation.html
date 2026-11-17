@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Modération : Polymatch</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex, nofollow"><link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#136577">
+<link rel="stylesheet" href="style.css">
+<style>
+.adm-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin:18px 0 8px;}
+.adm-card{border:1px solid var(--line);border-radius:3px;padding:16px 18px;background:#fff;}
+.adm-card .n{font-family:"Fahkwang",sans-serif;font-size:28px;font-weight:600;color:var(--teal);line-height:1.1;}
+.adm-card .l{font-size:13px;color:var(--slate);margin-top:4px;}
+.adm-card .s{font-size:12px;color:#8a8f95;margin-top:6px;line-height:1.5;}
+.adm-card.alert{border-color:#8f2d1c;background:#fdf6f5;}
+.adm-card.alert .n{color:#8f2d1c;}
+.adm-item{border:1px solid var(--line);border-radius:3px;padding:16px 18px;background:#fff;margin:12px 0;}
+.adm-item.pending{border-left:4px solid #8f2d1c;}
+.adm-head{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;font-size:13px;color:#6b7280;}
+.adm-head strong{color:var(--ink);font-size:14.5px;}
+.adm-quote{background:var(--soft);border:1px solid var(--line);border-radius:3px;padding:10px 12px;margin:10px 0;font-size:14px;white-space:pre-wrap;text-align:left;max-height:260px;overflow-y:auto;}
+.adm-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center;}
+.adm-actions textarea{min-height:44px;flex:1 1 100%;font-size:14px;padding:8px 10px;}
+.adm-tag{display:inline-block;font-size:10.5px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:2px;background:#eceef0;color:#555;}
+.adm-tag.red{background:#fae3e0;color:#8f2d1c;}
+.adm-tag.green{background:#dff0e3;color:#1f6b33;}
+.adm-tag.teal{background:var(--teal-pale);color:var(--teal);}
+.adm-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:16px 0 4px;}
+.adm-tools input,.adm-tools select{width:auto;flex:1 1 240px;}
+.adm-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);}
+.adm-row:last-child{border-bottom:none;}
+.adm-row .who{min-width:0;flex:1 1 280px;}
+.adm-row .who .nm{font-weight:700;color:var(--teal);}
+.adm-small{font-size:12.5px;color:#6b7280;text-align:left;margin:3px 0 0;}
+.btn.danger{background:#fff;color:#8f2d1c;border-color:#8f2d1c;}
+.btn.danger:hover{background:#fdf6f5;}
+</style>
+</head>
+<body>
+<a class="pm-skip" href="#contenu">Aller au contenu</a>
+<div id="pm-nav"></div>
+<main id="contenu" tabindex="-1">
+<div class="wrap wide">
+<div id="adm-gate"><p class="empty-note">Chargement…</p></div>
+<div id="adm" style="display:none;">
+<span class="eyebrow left">Administration</span>
+<h1 style="text-align:left;margin-bottom:6px;">Modération</h1>
+<p class="field-hint" style="margin-top:0;">Page réservée au compte administrateur. Chaque action est vérifiée par la base de données et inscrite au journal.</p>
+<div class="tabs" id="adm-tabs">
+<button class="tab-btn current" data-tab="overview">Vue d’ensemble</button>
+<button class="tab-btn" data-tab="reports">Signalements <span class="tab-count" id="adm-count"></span></button>
+<button class="tab-btn" data-tab="contact">Contact <span class="tab-count" id="adm-ccount"></span></button>
+<button class="tab-btn" data-tab="members">Membres</button>
+<button class="tab-btn" data-tab="hidden">Contenus masqués</button>
+<button class="tab-btn" data-tab="certs">Attestations</button>
+<button class="tab-btn" data-tab="log">Journal</button>
+<button class="tab-btn" data-tab="emails">E-mails</button>
+<button class="tab-btn" data-tab="errors">Erreurs <span class="tab-count" id="adm-ecount"></span></button>
+</div>
+<div id="adm-msg" class="msg-box" style="display:none;"></div>
+<div id="adm-panel"></div>
+</div>
+</div>
+</main>
+<div id="pm-footer"></div>
+<script src="outils/supabase-js-2.117.1.js"></script>
+<script src="app.js"></script>
+<script src="admin/moderation.js"></script>
+<script src="admin/moderation2.js"></script>
+<script src="admin/moderation3.js"></script>
+</body>
+</html>

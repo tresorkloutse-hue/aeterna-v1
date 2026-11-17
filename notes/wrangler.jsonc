@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mes-notes-de-cours",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://lbsqwtosjlfqlcthswqw.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_KEY": "sb_publishable_MxWQ-KWYVhJIALtktiJItQ_FTiTTrNb",
+    "NEXT_PUBLIC_VAPID_KEY": "BMwiYZe2dWHzM9bRQ8w5Nscbo6TwtXvLtJK9L8Iat6jutNlPPmgOzjofkJ8aNpk-Q5j-GBk4CTgL79S_Z2gOWJo"
+  },
+  "build": {
+    "command": "npx opennextjs-cloudflare build"
+  }
+}

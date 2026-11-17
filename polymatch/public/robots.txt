@@ -1,0 +1,45 @@
+# Polymatch : seules les pages publiques sont ouvertes aux moteurs.
+# Les pages de membres exigent une connexion, elles n'ont rien a indexer.
+User-agent: *
+Allow: /$
+Allow: /index.html
+Allow: /manifeste.html
+Allow: /textes.html
+Allow: /pourquoi-les-disciplines-ne-se-parlent-pas.html
+Allow: /comment-nommer-ce-qui-vous-manque.html
+Allow: /ce-qu-une-collaboration-change-a-un-travail.html
+Allow: /le-merite-et-la-preuve.html
+Allow: /interdisciplinarite-et-responsabilite.html
+Allow: /petite-histoire-des-frontieres-disciplinaires.html
+Allow: /verifier.html
+# Les ouvertures que leurs auteurs ont choisi de rendre lisibles sans compte.
+# Les autres pages de membres restent fermees.
+Allow: /ouvertures.html
+Allow: /ouverture.html
+Allow: /contact.html
+Allow: /mentions-legales.html
+Allow: /confidentialite.html
+Allow: /conditions.html
+# Les fichiers dont un moteur a besoin pour afficher ces pages comme un visiteur :
+# sans eux il voit une page sans mise en forme, sans menu et sans pied de page.
+Allow: /style.css
+Allow: /app.js
+Allow: /outils/
+# Les vingt dictionnaires de traduction. Un robot dont la langue n est pas le
+# francais essaie de les charger : sans cette ligne il se les voit refuser, et
+# la page qu il indexe est une page a moitie construite.
+Allow: /i18n-
+Allow: /polices/
+Allow: /images/
+Allow: /apercu.png
+Allow: /favicon.ico
+Allow: /favicon.svg
+# Le plan du site lui-meme : sans cette ligne, la liste blanche l interdit et
+# Google refuse de le lire, en affichant "Impossible de recuperer".
+Allow: /sitemap.xml
+# La cle IndexNow : elle sert a Bing et Yandex pour verifier que les adresses
+# soumises viennent bien du proprietaire du site.
+Allow: /97db1d794620765139146c2592d7dd83.txt
+Disallow: /
+
+Sitemap: https://polymatch.org/sitemap.xml

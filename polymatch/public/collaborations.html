@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Mes collaborations : Polymatch</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex"><link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#136577">
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<a class="pm-skip" href="#contenu">Aller au contenu</a>
+<div id="pm-nav"></div>
+<main id="contenu" tabindex="-1">
+<div class="wrap wide hero">
+<span class="eyebrow">Travail en cours et attestations</span>
+<h1>Mes collaborations</h1>
+<p class="sub">Tout ce qui est en cours avec quelqu’un, et où en est chaque attestation. Un projet peut réunir jusqu'à six personnes : chacune obtient sa propre attestation, qui nomme l'équipe entière.</p>
+</div>
+<div class="wrap wide">
+<div id="pm-msg" class="msg-box" style="display:none;"></div>
+<div id="pm-body"><p class="empty-note">Chargement…</p></div>
+</div>
+</main>
+<div id="pm-footer"></div>
+<script src="outils/supabase-js-2.117.1.js"></script>
+<script src="app.js"></script>
+<script>
+const bodyEl=document.getElementById("pm-body");const msgEl=document.getElementById("pm-msg");
+let me=null;
+
+function stateOf(st){
+if(!st||!st.has_collaboration)return {cls:"none",label:pmT("pas de collaboration")};
+if(st.revoked)return {cls:"revoked",label:pmT("révoquée")};
+if(st.issued)return {cls:"issued",label:pmT("délivrée")};
+var e=st.eligibility||{};
+var done=[(e.days_elapsed>=e.days_required),(e.messages_exchanged>=e.messages_required),!!e.has_shared_document,!!st.owner_confirmed,!!st.partner_confirmed].filter(Boolean).length;
+return {cls:"waiting",label:pmT(done>1?"{n} conditions sur 5":"{n} condition sur 5").replace("{n}",done)};
+}
+
+function lineHtml(projectId,partner,st){
+var s=stateOf(st);
+var mine=partner.id===me;
+return '<div class="c-line"><span class="c-who">'+pmEscape(partner.full_name)+(mine?' <span class="meta" style="font-weight:400;">'+pmT("(toi)")+"</span>":"")+(partner.discipline?' <span class="meta" style="font-weight:400;">'+pmEscape(partner.discipline)+"</span>":"")+"</span>"
++'<span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;"><span class="att-state '+s.cls+'">'+s.label+"</span>"
++'<a class="btn secondary small" href="attestation.html?project='+projectId+"&partner="+partner.id+'">'+(s.cls==="issued"?"Voir l’attestation":"Ouvrir")+"</a></span></div>";
+}
+
+function projectBlock(project, partnerRows, roleLabel){
+var team=[];
+if(partnerRows.length&&partnerRows[0].st&&partnerRows[0].st.team)team=partnerRows[0].st.team;
+var teamLine=team.length?('<div class="c-team">'+pmT("Équipe :")+" "+team.map(function(m){return pmEscape(m.full_name)+(m.is_owner?" "+pmT("(porteur)"):"");}).join(" · ")+"</div>"):"";
+var places="";
+if(project.owner_type==="institution"&&project.places){
+var taken=partnerRows.length;
+places='<div class="meta" style="margin-top:4px;">'+pmT(taken>1?"{a} places pourvues sur {b}":"{a} place pourvue sur {b}").replace("{a}",taken).replace("{b}",project.places)+"</div>";
+}
+return '<div class="collab-row">'
++'<div class="c-title"><a href="projet.html?id='+project.id+'">'+pmEscape(project.title)+"</a></div>"
++'<div class="meta">'+roleLabel+"</div>"
++teamLine+places
++'<div class="c-lines">'+partnerRows.map(function(r){return lineHtml(project.id,r.partner,r.st);}).join("")+"</div>"
++'<div class="cta-row left" style="margin-top:12px;"><a class="btn secondary small" href="espace.html?project='+project.id+'">Espace de travail</a><a class="btn secondary small" href="projet.html?id='+project.id+'">Fiche du projet</a></div>'
++"</div>";
+}
+
+async function statusFor(projectId,partnerId){
+var r=await client.rpc("completion_status",{p_project_id:projectId,p_partner_id:partnerId});
+return r.error?null:r.data;
+}
+
+async function render(){
+const owned=await client.from("projects").select("id,title,owner_type,places,owner_id").eq("owner_id",me).order("created_at",{ascending:false});
+if(owned.error){pmShowMessage(msgEl,pmT("Erreur de chargement : {m}").replace("{m}",owned.error.message),"error");bodyEl.innerHTML="";return;}
+
+const mineApps=await client.from("applications").select("project_id,accepted_at,projects(id,title,owner_type,places,owner_id,profiles(full_name))").eq("applicant_id",me).eq("status","accepted");
+if(mineApps.error){pmShowMessage(msgEl,pmT("Erreur de chargement : {m}").replace("{m}",mineApps.error.message),"error");bodyEl.innerHTML="";return;}
+
+let html="";
+let issued=[];
+
+const ownedBlocks=[];
+for(const project of (owned.data||[])){
+const apps=await client.from("applications").select("applicant_id,profiles(full_name,discipline)").eq("project_id",project.id).eq("status","accepted");
+const rows=[];
+for(const a of (apps.data||[])){
+const st=await statusFor(project.id,a.applicant_id);
+rows.push({partner:{id:a.applicant_id,full_name:(a.profiles&&a.profiles.full_name)||"Partenaire",discipline:a.profiles&&a.profiles.discipline},st:st});
+}
+if(rows.length===0)continue;
+ownedBlocks.push(projectBlock(project,rows,pmV("Tu portes ce projet","Vous portez cet appel")));
+}
+
+const partnerBlocks=[];
+for(const a of (mineApps.data||[])){
+const project=a.projects;
+if(!project)continue;
+const st=await statusFor(project.id,me);
+if(st&&st.issued&&st.certificate_code){issued.push({code:st.certificate_code,title:project.title,team:st.team||[],issued_at:st.issued_at,project:project.id});}
+const ownerName=(project.profiles&&project.profiles.full_name)||pmT("le porteur");
+partnerBlocks.push(projectBlock(project,[{partner:{id:me,full_name:pmV("Toi","Vous"),discipline:null},st:st}],pmT("Projet porté par {who}").replace("{who}",pmEscape(ownerName))));
+}
+
+for(const project of (owned.data||[])){
+const st=await statusFor(project.id,me);
+if(st&&st.issued&&st.certificate_code){issued.push({code:st.certificate_code,title:project.title,team:st.team||[],issued_at:st.issued_at,project:project.id});}
+}
+
+if(ownedBlocks.length===0&&partnerBlocks.length===0){
+html='<div class="example"><div class="ex-tag">Rien à afficher pour l’instant</div><p>Une collaboration commence quand une candidature est acceptée : la tienne sur le projet de quelqu’un, ou celle de quelqu’un sur le tien. À partir de là un espace de travail s’ouvre, et le compte à rebours de l’attestation démarre.</p></div>'
++'<div class="cta-row left"><a class="btn accent" href="projets.html">Voir les projets ouverts</a><a class="btn secondary" href="membres.html">Parcourir l’annuaire</a></div>';
+}else{
+if(partnerBlocks.length){html+='<h2 class="section-title">Projets sur lesquels je travaille</h2>'+partnerBlocks.join("");}
+if(ownedBlocks.length){html+='<h2 class="section-title">Projets que je porte</h2>'+ownedBlocks.join("");}
+}
+
+if(issued.length){
+html+='<h2 class="section-title">Mes attestations obtenues</h2>';
+html+=issued.map(function(c){
+return '<div class="collab-row"><div class="c-title"><a href="attestation.html?project='+c.project+"&partner="+me+'">'+pmEscape(c.title)+"</a></div>"
++'<div class="c-team">'+pmT("Avec")+" "+c.team.filter(function(m){return m.id!==me;}).map(function(m){return pmEscape(m.full_name);}).join(", ")+"</div>"
++'<div class="meta">'+pmT("Délivrée le {d}").replace("{d}",pmFormatDate(c.issued_at))+' · code <span class="verify-code">'+pmEscape(c.code)+"</span></div>"
++'<div class="cta-row left" style="margin-top:10px;"><a class="btn secondary small" href="attestation.html?project='+c.project+"&partner="+me+'">Imprimer</a><a class="btn secondary small" href="verifier.html?code='+encodeURIComponent(c.code)+'">Page de vérification</a></div></div>';
+}).join("");
+}else{
+html+='<h2 class="section-title">Mes attestations obtenues</h2><p class="empty-note">Aucune attestation délivrée pour l’instant. Les conditions sont détaillées sur la page de chaque collaboration : du temps écoulé, des échanges réels, un document que tu as modifié toi-même, et l’accord des deux parties.</p>';
+}
+
+bodyEl.innerHTML=html;
+}
+
+(async function(){
+const session=await pmInitNav("collaborations.html");
+if(!session){window.location.href="connexion.html?next=collaborations.html";return;}
+me=session.user.id;
+await render();
+})();
+</script>
+</body>
+</html>
