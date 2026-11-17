@@ -13,7 +13,7 @@ jobs:
           : > adresses.txt
           for s in tresorkloutse tresorkloutse-hue tresor-kloutse tresorkloutse1 tresorkloutsehue kloutse tresor; do
             for w in mes-notes-de-cours monrepetiteur clipper-pro polymatch; do
-              c=$(curl -s -o /dev/null -w '%{http_code}' -m 10 "https://$w.$s.workers.dev/")
+              c=$(curl -s -o /dev/null -w '%{http_code}' -m 10 "https://$w.$s.workers.dev/" || true)
               echo "$c https://$w.$s.workers.dev/" >> adresses.txt
             done
           done
