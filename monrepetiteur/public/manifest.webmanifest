@@ -1,0 +1,14 @@
+{
+  "name": "MonRépétiteur",
+  "short_name": "MonRépétiteur",
+  "description": "Le répétiteur IA qui fait réfléchir, de la 6e à la Terminale.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EEF1F8",
+  "theme_color": "#1A2A6C",
+  "icons": [
+    { "src": "icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

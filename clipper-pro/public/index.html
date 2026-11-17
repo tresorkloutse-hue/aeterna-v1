@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c10">
+<title>Clipper Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="app.css">
+<link rel="modulepreload" href="js/main.js">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo" aria-hidden="true"></span>Clipper <b>PRO</b></div>
+  <p class="tag">Repère chaque moment fort d’un film et transforme-le en clips verticaux, prêts à publier.</p>
+</header>
+<nav class="stepper" id="stepper" aria-label="Progression"><span data-s="1">Film</span><span data-s="2">Analyse</span><span data-s="3">Clips</span><span data-s="4">Export</span></nav>
+
+<main id="main">
+  <div class="steps">
+    <section class="card" id="s1">
+      <h2><span class="num">1</span>Mets ton film ici</h2>
+      <div id="drop" class="drop" tabindex="0" role="button" aria-label="Choisir un fichier vidéo">
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="14" width="48" height="36" rx="6"/><path d="M8 24h48M20 14l-6 10M34 14l-6 10M48 14l-6 10"/><path d="M28 32l10 6-10 6z"/></svg>
+        <strong>Dépose ton fichier ici</strong>
+        <span>ou touche ici pour choisir un fichier (MP4 ou MOV conseillés)</span>
+        <span class="btn primary">Choisir un film</span>
+        <input id="file" type="file" accept="video/*" hidden>
+      </div>
+      <div id="recent" class="recent" hidden></div>
+      <div id="vbox" hidden>
+        <video id="v" controls playsinline preload="auto"></video>
+        <div class="row"><button id="other" class="btn" type="button">Changer de film</button><span id="vinfo" class="muted"></span></div>
+        <p id="qwarn" class="warn" hidden></p>
+      </div>
+    </section>
+
+    <section class="card" id="s2" hidden>
+      <h2><span class="num">2</span>Trouver les moments forts</h2>
+      <div class="grid">
+        <label>Type de moments<select id="mtype"><option value="all">Action + répliques</option><option value="action">Action uniquement</option></select></label>
+        <label>Sélectivité<select id="sens"><option value=".6">Large (40 % du film)</option><option value=".75">Normale (25 %)</option><option value=".88">Stricte (12 %)</option></select></label>
+        <label>Nombre de moments<select id="limit"><option value="999">Tous</option><option value="5">5 meilleurs</option><option value="10">10 meilleurs</option><option value="20">20 meilleurs</option></select></label>
+        <label>Durée minimale d’un clip<select id="minLen"><option value="60">1 min</option><option value="90">1 min 30</option><option value="120">2 min</option></select></label>
+        <label>Durée visée d’une partie<select id="partLen"><option value="90">1 min 30</option><option value="120">2 min</option><option value="180">3 min</option></select></label>
+        <label>Longueur max d’un moment<select id="maxMoment"><option value="300">5 min</option><option value="600">10 min</option><option value="900">15 min</option></select></label>
+        <label>Méthode d’analyse<select id="method"><option value="auto">Rapide (recommandée)</option><option value="play8">Lecture 8x (son et image)</option><option value="play16">Lecture 16x (son et image)</option><option value="turbo24">Turbo 24x (image seule)</option><option value="turbo48">Turbo 48x (image seule)</option></select></label>
+      </div>
+      <div class="row"><button id="analyse" class="btn primary" type="button">Analyser le film</button><button id="stopAn" class="btn" type="button" hidden>Arrêter</button><span id="status" class="muted"></span></div>
+      <div class="bar" id="bar"><i id="barFill"></i></div>
+      <p class="muted" id="tlcap" hidden>Intensité du film : les zones colorées sont les clips proposés, les traits blancs marquent les changements de partie. Touche la frise pour te placer dans la vidéo.</p>
+      <canvas id="tl" width="1000" height="84" hidden aria-label="Frise des moments forts"></canvas>
+    </section>
+
+    <section class="card" id="s3" hidden>
+      <h2><span class="num">3</span>Clips proposés</h2>
+      <p id="stats" class="note-box"></p>
+      <div class="row">
+        <button id="allOn" class="btn" type="button">Tout cocher</button>
+        <button id="allOff" class="btn" type="button">Tout décocher</button>
+        <button id="best" class="btn" type="button">Garder les meilleurs scores</button>
+        <button id="subsAll" class="btn" type="button">Sous-titres des clips cochés</button>
+      </div>
+      <p id="subsStatus" class="muted"></p>
+      <p class="muted small">Le chiffre coloré est le score de viralité : touche-le pour voir les points à améliorer.</p>
+      <div id="list"></div>
+    </section>
+
+    <section class="card" id="s4" hidden>
+      <h2><span class="num">4</span>Habillage et export</h2>
+      <div class="grid">
+        <h3 class="sub">Habillage</h3>
+        <label class="full">Titre affiché en haut<input id="title" type="text" placeholder="Film : Titre du film"></label>
+        <label class="check full"><input id="showTitle" type="checkbox"> Afficher un titre en haut des vidéos (décoche pour n’en mettre aucun)</label>
+        <label>Genre<select id="genre"></select></label>
+        <label class="full">Accroche des 3 premières secondes<input id="hook3" type="text"></label>
+        <label class="full">Bandeau d’abonnement<input id="cta" type="text"></label>
+        <label class="check full"><input id="subAnim" type="checkbox"> Petite animation « Abonne-toi » sur le bandeau (2 fois par clip, 3 secondes)</label>
+        <label class="full">Texte de fin (3 dernières secondes)<input id="outro" type="text"></label>
+        <label class="check full"><input id="loopOn" type="checkbox"> Boucle parfaite : la fin se fond dans le début</label>
+        <label class="check full"><input id="nextCard" type="checkbox"> Écran « La suite ➜ partie suivante sur mon profil » à la fin des parties (décoche pour l’enlever partout ; tu peux aussi l’enlever partie par partie dans « Titre et découpe »)</label>
+
+        <h3 class="sub">Sous-titres automatiques</h3>
+        <label class="check full"><input id="subsOn" type="checkbox"> Ajouter les sous-titres (générés dans ton navigateur, sans envoi de données)</label>
+        <label>Style<select id="subsStyle"><option value="pop">Mot surligné</option><option value="classic">Classique</option><option value="box">Encadré</option></select></label>
+        <label>Taille<select id="subsSize"><option value="s">Petite</option><option value="m">Moyenne</option><option value="l">Grande</option></select></label>
+        <label class="full">Précision des sous-titres<select id="subsModel"><option value="auto">Automatique : la plus précise que ton ordinateur permet</option><option value="turbo">Maximale (téléchargement unique d’environ 560 Mo, carte graphique récente)</option><option value="small">Haute (téléchargement unique d’environ 250 Mo)</option><option value="base">Rapide (environ 80 Mo, moins précise)</option></select></label>
+        <label>Langue du film<select id="subsLang"><option value="french">Français</option><option value="english">Anglais</option><option value="spanish">Espagnol</option><option value="italian">Italien</option><option value="german">Allemand</option><option value="portuguese">Portugais</option><option value="auto">Détection automatique</option></select></label>
+
+        <h3 class="sub">Musique</h3>
+        <div class="full">
+          <div class="chips" id="cats"></div>
+          <div id="tracks"></div>
+          <p class="muted small">Musiques instrumentales sans voix créées dans ton navigateur, libres d’usage. Pour des pistes plus riches : <a id="moreMusic" href="https://pixabay.com/music/" target="_blank" rel="noopener">cherche sur Pixabay Music</a>, télécharge le fichier et charge-le ci-dessous.</p>
+        </div>
+        <label class="full">Ma musique (facultatif)<input id="musicFile" type="file" accept="audio/*"><span class="muted" id="musicName">Aucune musique choisie</span><button id="musicRemove" type="button" class="btn sm" hidden>Retirer la musique</button></label>
+        <label>Volume de la musique<input id="musicVol" type="range" min="0" max="100"></label>
+        <label>Volume du film<input id="filmVol" type="range" min="0" max="100"></label>
+
+        <h3 class="sub">Cadrage</h3>
+        <label>Cadrage<select id="mode"><option value="z60">Agrandi (conseillé)</option><option value="z35">Agrandi léger</option><option value="z80">Très agrandi</option><option value="fill">Plein écran (recadré)</option><option value="fit">Image entière</option></select></label>
+        <label class="check"><input id="follow" type="checkbox"> Le cadre suit l’action</label>
+        <label class="full">Position du cadre (si le suivi est désactivé)<input id="offset" type="range" min="0" max="100"></label>
+        <label>Fond autour de l’image<select id="bgStyle"><option value="soft">Flou doux</option><option value="strong">Flou intense</option><option value="cine">Flou cinéma (assombri)</option><option value="vivid">Flou vif</option><option value="glow">Flou lumineux</option><option value="bw">Flou noir et blanc</option><option value="color">Couleur dominante</option><option value="black">Noir uni</option></select></label>
+        <label>Force du flou<input id="bgBlur" type="range" min="0" max="100"></label>
+
+        <h3 class="sub">Qualité</h3>
+        <label>Qualité<select id="quality"><option value="tiktok">2K 1440p (conseillée)</option><option value="high">2K 1440p maximale (fichier plus lourd)</option><option value="uhd">4K 2160p (export plus long, fichier très lourd)</option><option value="hd">Full HD 1080p</option><option value="light">Légère 720p</option></select></label>
+        <label>Format<select id="fmt"><option value="mp4">MP4 (conseillé pour TikTok)</option><option value="webm">WebM</option></select></label>
+        <label>Méthode d’export<select id="engine"><option value="auto">Automatique (conseillée)</option><option value="fast">Rapide hors temps réel</option><option value="live">Temps réel</option></select></label>
+        <label>Couleurs et contraste<select id="colors"><option value="off">Aucun</option><option value="light">Léger</option><option value="medium">Moyen</option><option value="strong">Fort (conseillé)</option><option value="max">Très fort</option></select></label>
+        <label>Netteté<select id="sharp"><option value="off">Aucun</option><option value="light">Léger</option><option value="medium">Moyen</option><option value="strong">Fort (conseillé)</option><option value="max">Très fort</option></select></label>
+        <label>Luminosité<select id="bright"><option value="auto">Automatique (éclaircit seulement les scènes sombres)</option><option value="d2">Plus sombre</option><option value="d1">Légèrement plus sombre</option><option value="n">Normale</option><option value="b1">Plus lumineuse</option><option value="b2">Très lumineuse (scènes sombres)</option><option value="b3">Maximale</option></select></label>
+        <p class="muted small full">L’aperçu montre le rendu final, en pause comme pendant la lecture. Si ton ordinateur n’arrive pas à suivre pendant la lecture, l’aperçu passe en version simplifiée ; l’export applique toujours le rendu complet.</p>
+      </div>
+      <h3 class="sub">Image de couverture TikTok</h3>
+      <div id="coverBox">
+        <p class="muted small">Le site choisit les 3 meilleures images du clip (nettes, bien exposées, colorées), leur applique tes réglages d’image et ajoute un grand titre placé au centre, là où il reste visible dans la grille de ton profil.</p>
+        <div class="row"><select id="coverClip" aria-label="Clip"></select><input id="coverText" type="text" placeholder="Texte de la couverture (titre de la partie ou du film par défaut)"><button id="coverGen" class="btn sm" type="button">Proposer 3 couvertures</button></div>
+        <div id="coverOut" class="covers"></div>
+        <p class="muted small">Sur TikTok, au moment de publier : « Modifier la couverture », puis importe l’image téléchargée si l’option est proposée. Sinon, choisis dans la vidéo l’instant le plus proche.</p>
+      </div>
+      <h3 class="sub">Export</h3>
+      <div class="row">
+        <button id="export" class="btn primary" type="button">Exporter les clips cochés</button>
+        <button id="stopExp" class="btn danger" type="button" hidden>Arrêter l’export</button>
+        <button id="endPrev" class="btn" type="button">Aperçu de la fin</button>
+      </div>
+      <label class="check"><input id="redoAll" type="checkbox"> Refaire aussi les clips déjà exportés</label>
+      <p id="estim" class="muted small"></p>
+      <div class="bar" id="bar2"><i id="barFill2"></i></div>
+      <p id="status2" class="muted"></p>
+    </section>
+  </div>
+
+  <aside class="phone-col" id="phoneCol">
+    <div class="phone"><i class="notch"></i><canvas id="cv" width="720" height="1280" aria-label="Aperçu du clip vertical"></canvas></div>
+    <p class="phone-cap"><i class="dot"></i>Aperçu en direct</p>
+  </aside>
+</main>
+<p class="note">La détection repose sur le son et le mouvement de l’image, pas sur le sens de l’histoire : vérifie chaque clip. Utilise seulement des vidéos dont tu as les droits ou une autorisation écrite. Tout se passe dans ton navigateur : aucun fichier n’est envoyé.</p>
+
+<nav id="dock" aria-label="Raccourcis">
+  <button id="dStop" class="danger" type="button" hidden>Arrêter</button>
+  <button data-panel="films" type="button"><span class="l">Mes films</span><span class="s">Films</span></button>
+  <button data-panel="caps" type="button"><span class="l">Titres et hashtags</span><span class="s">Légendes</span></button>
+  <button data-panel="lib" type="button"><span class="l">Bibliothèque</span><span class="s">Clips</span><span id="dLib" class="cnt"></span></button>
+  <button data-panel="stats" type="button"><span class="l">Résultats</span><span class="s">Stats</span></button>
+  <button data-panel="pub" class="primary" type="button">Publier</button>
+</nav>
+
+<aside class="drawer" id="p-films" aria-label="Mes films">
+  <header><h2>Mes films</h2><button class="btn sm close" type="button">Fermer</button></header>
+  <p class="lead">Tous les films que tu as ouverts, avec leur analyse et leurs clips. Ouvre-en un pour reprendre là où tu t’étais arrêté.</p>
+  <div class="body" id="filmsList"></div>
+  <footer><label class="check"><input type="checkbox" id="keepFilm"> Garder les films en mémoire sur cet appareil (prend de la place)</label><span id="filmsStore" class="muted small"></span></footer>
+</aside>
+
+<aside class="drawer" id="p-caps" aria-label="Titres et hashtags">
+  <header><h2>Titres, légendes et hashtags</h2><button class="btn sm close" type="button">Fermer</button></header>
+  <div class="opts">
+    <label class="full">Acteurs ou personnages (séparés par des virgules)<input id="cap_cast" placeholder="Ex. : Prénom Nom, Nom du personnage"></label>
+    <label>Mots-clés en plus<input id="cap_kw" placeholder="Ex. : vengeance, poursuite"></label>
+    <label>Ton<select id="cap_tone"></select></label>
+    <label>Nombre de hashtags<select id="cap_nh"><option>6</option><option>8</option><option>10</option><option>12</option></select></label>
+    <label class="check"><input id="cap_emo" type="checkbox"> Ajouter des emojis</label>
+  </div>
+  <div class="row pad"><button class="btn primary sm" id="capGen" type="button">Nouvelles versions pour tous</button><button class="btn sm" id="capCopy" type="button">Tout copier</button><button class="btn sm" id="capAi" type="button">Copier une demande pour une IA</button></div>
+  <div class="blk tool mx">
+    <h3>Légendes rédigées par Claude (précision maximale)</h3>
+    <p class="clip-s">1. Télécharge la fiche : elle contient pour chaque clip les sous-titres, ta note et 3 images de la scène. 2. Ouvre ton outil « Légendes Clipper » (sur ton compte Claude) et dépose-la. 3. Récupère le fichier de réponse et importe-le ici : les légendes remplacent celles des clips correspondants, y compris dans la bibliothèque.</p>
+    <div class="row"><button class="btn primary sm" id="capExport" type="button">Télécharger la fiche pour Claude</button><button class="btn sm" id="capImport" type="button">Importer les légendes de Claude</button><input type="file" id="capImportFile" accept=".json,application/json" hidden></div>
+    <span class="clip-s" id="capClaudeStatus"></span>
+  </div>
+  <p class="lead">Sinon, les légendes automatiques ci-dessous sont enregistrées avec chaque clip à l’export. Une note sur la scène ou une réplique des sous-titres les rend plus précises.</p>
+  <div class="body" id="capsOut"></div>
+</aside>
+
+<aside class="drawer" id="p-lib" aria-label="Bibliothèque">
+  <header><h2>Bibliothèque</h2><button class="btn sm close" type="button">Fermer</button></header>
+  <div class="row pad" id="libTabs"><button class="chip on" data-t="todo" type="button">À publier</button><button class="chip" data-t="done" type="button">Publiés</button><button class="chip" data-t="all" type="button">Tous</button><select id="libFilm" aria-label="Filtrer par film"></select></div>
+  <div class="body" id="libList"></div>
+  <footer><span id="libStore" class="muted small"></span><span class="row"><button class="btn sm" id="errs" type="button">Rapport de problèmes</button><button class="btn sm ghost" id="wipe" type="button">Tout effacer</button></span></footer>
+</aside>
+
+<aside class="drawer" id="p-pub" aria-label="Publier sur TikTok">
+  <header><h2>Publier sur TikTok</h2><button class="btn sm close" type="button">Fermer</button></header>
+  <p class="lead">Le bouton télécharge la vidéo, copie la légende et ouvre TikTok Studio : importe la vidéo, colle la légende (Ctrl+V), puis choisis « Programmer » pour la date prévue. Pour la meilleure qualité, publie depuis l’ordinateur ; sur téléphone, active « Importer en HD ».</p>
+  <p class="lead strong" id="pubInfo"></p>
+  <p class="lead hint" id="pubHours"></p>
+  <div class="body" id="pubList"></div>
+</aside>
+
+<aside class="drawer" id="p-stats" aria-label="Résultats">
+  <header><h2>Résultats</h2><button class="btn sm close" type="button">Fermer</button></header>
+  <p class="lead">Note les vues et les abonnés de chaque clip publié (dans la bibliothèque, onglet « Publiés ») : le site te montre ce qui marche pour ton public.</p>
+  <div class="body" id="statsBody"></div>
+</aside>
+
+<div id="toast" role="status" hidden></div>
+<script type="module" src="js/main.js"></script>
+<script type="module" src="js/cover.js"></script>
+</body>
+</html>
