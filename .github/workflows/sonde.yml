@@ -1,4 +1,4 @@
-name: Verif domaine
+name: Verif domaine 2
 on:
   push:
     paths: [".github/workflows/sonde.yml"]
