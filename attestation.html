@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Attestation de collaboration : Polymatch</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#136577">
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<a class="pm-skip" href="#contenu">Aller au contenu</a>
+<div id="pm-nav"></div>
+<main id="contenu" tabindex="-1">
+<div class="wrap" id="pm-content"><p class="empty-note">Chargement…</p></div>
+</main>
+<div id="pm-footer"></div>
+<script src="outils/supabase-js-2.117.1.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU" crossorigin="anonymous"></script>
+<script src="app.js"></script>
+<script>
+const contentEl=document.getElementById("pm-content");
+function qp(){return new URLSearchParams(window.location.search);}
+function fmtDate(iso){if(!iso)return "";try{return new Date(iso).toLocaleDateString(pmLocale(),{day:"numeric",month:"long",year:"numeric"});}catch(e){return "";}}
+function weeksBetween(a,b){if(!a||!b)return null;var d=(new Date(b)-new Date(a))/86400000;if(!isFinite(d)||d<0)return null;var w=Math.max(1,Math.round(d/7));return pmT(w>1?"{n} semaines":"{n} semaine").replace("{n}",w);}
+function verifyUrl(code){return window.location.origin+"/verifier.html?code="+encodeURIComponent(code);}
+
+function certificateHtml(p){
+var others=p.team.filter(function(m){return m.id!==p.holderId;});
+var withLine=others.length?('<div class="pair">'+pmT("avec")+" "+others.map(function(m){return pmEscape(m.full_name);}).join(", ")+"</div>"):"";
+var discs=[];p.team.forEach(function(m){if(m.discipline&&discs.indexOf(m.discipline)===-1)discs.push(m.discipline);});
+var discLine=discs.length>1?('<div class="disciplines">'+discs.map(pmEscape).join(" &nbsp;&times;&nbsp; ")+"</div>"):(discs.length?('<div class="disciplines">'+pmEscape(discs[0])+"</div>"):"");
+var dur=weeksBetween(p.startedAt,p.issuedAt);
+var durLine=dur?('<div class="dur">'+pmT("{dur} de travail commun, du {a} au {b}").replace("{dur}",dur).replace("{a}",fmtDate(p.startedAt)).replace("{b}",fmtDate(p.issuedAt))+"</div>"):"";
+var said=others.length>1?"A mené ce travail avec cette équipe jusqu’à son terme, chacun depuis sa discipline, sur la plateforme Polymatch."
+  :"A mené ce travail jusqu’à son terme, chacun depuis sa discipline, sur la plateforme Polymatch.";
+return '<div class="att a" id="pm-att">'
++'<span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>'
++'<div class="seal"><span class="r-top"></span><span class="name">POLYMATCH</span><span class="sub-mark">INTERDISCIPLINAIRE</span><span class="r-bot"></span></div>'
++'<div class="kind">Attestation de collaboration interdisciplinaire</div>'
++'<div class="who">'+pmEscape(p.holderName)+withLine+"</div>"
++discLine
++'<div class="title">'+pmEscape(p.projectTitle)+"</div>"
++'<p class="said">'+said+"</p>"
++durLine
++'<div class="sigs">'
++'<div class="sig"><div class="n">'+pmEscape(p.holderName)+'</div><div class="d">'+pmT("A confirmé ce travail le {d}").replace("{d}",fmtDate(p.holderConfirmedAt))+"</div></div>"
++'<div class="sig"><div class="n">'+pmEscape(p.ownerName)+'</div><div class="d">'+pmT("A confirmé ce travail le {d}").replace("{d}",fmtDate(p.ownerConfirmedAt))+"</div></div>"
++"</div>"
++'<div class="foot"><div id="pm-qr" class="qr-box"></div><div class="f-txt">'+pmT("Vérifiable par quiconque, sans compte, en scannant ce code ou en saisissant la référence sur {host}/verifier.html").replace("{host}",pmEscape(window.location.host))+'<br><span class="code">'+pmEscape(p.code)+"</span></div></div>"
++"</div>";
+}
+
+function drawQr(code){
+var host=document.getElementById("pm-qr");
+if(!host)return;
+if(typeof QRCode==="undefined"){host.innerHTML='<span class="qr-fallback">'+pmT("Code de vérification : {c}").replace("{c}",pmEscape(code))+"</span>";return;}
+try{new QRCode(host,{text:verifyUrl(code),width:150,height:150,colorDark:"#136577",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});}
+catch(e){host.innerHTML='<span class="qr-fallback">'+pmT("Code de vérification : {c}").replace("{c}",pmEscape(code))+"</span>";}
+}
+
+function checklistHtml(e,iAmHolder,holderName,ownerName,myConfirmed,otherConfirmed,otherName){
+return '<ul class="check-list">'
++'<li class="'+(e.days_elapsed>=e.days_required?"done":"")+'">'+pmT("Au moins {r} jours écoulés depuis l’acceptation de {who} ({e} à ce jour)").replace("{r}",e.days_required).replace("{who}",pmEscape(holderName)).replace("{e}",e.days_elapsed)+"</li>"
++'<li class="'+(e.messages_exchanged>=e.messages_required?"done":"")+'">'+pmT("Au moins {r} messages échangés avec l’équipe ({e} à ce jour)").replace("{r}",e.messages_required).replace("{e}",e.messages_exchanged)+"</li>"
++'<li class="'+(e.has_shared_document?"done":"")+'">'+pmT("Un document de l’espace partagé modifié par {who} après son acceptation").replace("{who}",pmEscape(holderName))+"</li>"
++'<li class="'+(myConfirmed?"done":"")+'">'+pmV("Ta confirmation","Votre confirmation")+"</li>"
++'<li class="'+(otherConfirmed?"done":"")+'">'+pmT("La confirmation de {who}").replace("{who}",pmEscape(otherName))+"</li></ul>";
+}
+
+async function render(){
+const session=await pmRequireSession("attestation.html"+window.location.search);
+if(!session)return;
+const projectId=qp().get("project");const partnerId=qp().get("partner");
+if(!projectId||!partnerId){contentEl.innerHTML='<p class="empty-note">Lien d’attestation incomplet. Passe par <a href="collaborations.html">Mes collaborations</a>.</p>';return;}
+
+const pr=await client.from("projects").select("id,title,owner_id,discipline,profiles(full_name)").eq("id",projectId).maybeSingle();
+const project=pr.data;
+if(pr.error||!project){contentEl.innerHTML='<p class="empty-note">Projet introuvable.</p>';return;}
+
+const isOwner=session.user.id===project.owner_id;
+const isHolder=session.user.id===partnerId;
+if(!isOwner&&!isHolder){contentEl.innerHTML='<p class="empty-note">Cette attestation ne te concerne pas. Voir <a href="collaborations.html">tes collaborations</a>.</p>';return;}
+
+const st=await client.rpc("completion_status",{p_project_id:projectId,p_partner_id:partnerId});
+if(st.error){contentEl.innerHTML='<div class="msg-box error">'+pmEscape(st.error.message)+"</div>";return;}
+const status=st.data;
+if(!status||!status.has_collaboration){contentEl.innerHTML='<p class="empty-note">Aucune collaboration acceptée n’a été trouvée pour cette personne sur ce projet.</p>';return;}
+
+const team=status.team||[];
+const ownerName=(project.profiles&&project.profiles.full_name)||pmT("le porteur");
+const holderMember=team.filter(function(m){return m.id===partnerId;})[0];
+const holderName=(holderMember&&holderMember.full_name)||pmT("le partenaire");
+const myConfirmed=isOwner?status.owner_confirmed:status.partner_confirmed;
+const otherConfirmed=isOwner?status.partner_confirmed:status.owner_confirmed;
+const otherName=isOwner?holderName:ownerName;
+
+let head='<p class="meta" style="margin-bottom:16px;"><a class="author-link" href="collaborations.html">Mes collaborations</a> &middot; <a class="author-link" href="projet.html?id='+project.id+'">La fiche du projet</a></p>'
++'<span class="eyebrow left">Attestation de collaboration</span>'
++'<h1 style="text-align:left;">'+pmEscape(project.title)+"</h1>"
++'<p class="sub">'+(team.length>2?pmT("Attestation au nom de {who}, nommant l’équipe entière de {n} personnes.").replace("{who}",pmEscape(holderName)).replace("{n}",team.length):pmT("Attestation au nom de {who}, nommant l’équipe entière.").replace("{who}",pmEscape(holderName)))+" "+pmT("Chaque participant a la sienne. Elle n’est délivrée que si la collaboration a laissé des traces vérifiables et que les deux parties confirment.")+"</p>"
++'<p class="meta">'+pmT("Équipe :")+" "+team.map(function(m){return pmEscape(m.full_name)+(m.is_owner?" "+pmT("(porteur)"):"")+(m.discipline?" — "+pmEscape(m.discipline):"");}).join(" &middot; ")+"</p>";
+
+let body="";
+
+if(status.revoked){
+body='<div class="sec-warn">'+pmT("Cette attestation a été révoquée le {d}.").replace("{d}",fmtDate(status.revoked_at))
++(status.revoke_reason?(" "+pmT("Motif indiqué : {m}.").replace("{m}",pmEscape(status.revoke_reason))):"")
++" "+pmT("Le code {c} ne vaut plus rien sur la page de vérification publique, et cette décision n’est pas annulable.").replace("{c}",pmEscape(status.certificate_code||""))+"</div>";
+}else if(status.issued){
+body=certificateHtml({
+holderId:partnerId,holderName:holderName,ownerName:ownerName,projectTitle:project.title,team:team,
+code:status.certificate_code,issuedAt:status.issued_at,startedAt:status.accepted_at,
+holderConfirmedAt:status.partner_confirmed_at,ownerConfirmedAt:status.owner_confirmed_at
+})
++'<div class="cta-row left no-print"><button class="btn accent" id="pm-print">Imprimer ou enregistrer en PDF</button><a class="btn secondary" href="verifier.html?code='+encodeURIComponent(status.certificate_code)+'">Voir la page de vérification publique</a></div>'
++'<p class="field-hint no-print">Le QR code est dessiné sur cette page, rien de l’attestation ne sort du site. Une impression en PDF garde le code et le QR.</p>'
++'<div class="id-card no-print"><p class="ex-label" style="margin-top:0;">Révoquer</p><p class="field-hint">Si cette attestation a été obtenue à tort, chacune des deux parties peut la révoquer. Le code devient alors invalide publiquement, définitivement.</p><button class="btn secondary small" id="pm-revoke">Révoquer cette attestation</button></div>';
+}else{
+const e=status.eligibility;
+body='<div class="example"><div class="ex-tag">Pourquoi ce n’est pas un badge à un clic</div><p>Une attestation Polymatch demande du temps écoulé, des échanges réels avec l’équipe, un document que la personne a elle-même modifié dans l’espace partagé, et l’accord des deux parties. C’est ce qui lui donne sa valeur devant un jury ou un recruteur.</p></div>'
++'<div class="id-card"><p class="confirm-status">'+(myConfirmed?pmV("Tu as confirmé cette collaboration.","Vous avez confirmé cette collaboration."):pmV("Tu n’as pas encore confirmé.","Vous n’avez pas encore confirmé."))+"</p>"
++'<p class="confirm-status">'+(otherConfirmed?pmT("{who} a confirmé de son côté.").replace("{who}",pmEscape(otherName)):pmT("En attente de la confirmation de {who}.").replace("{who}",pmEscape(otherName)))+"</p>"
++checklistHtml(e,isHolder,holderName,ownerName,myConfirmed,otherConfirmed,otherName)+"</div>";
+if(!myConfirmed){
+body+='<form class="card" id="pm-confirm-form"><label for="pm-reflection">En quelques mots, qu’avez-vous accompli ensemble ?</label><textarea id="pm-reflection" placeholder="Ce que vous avez produit, et ce que l’autre discipline a changé dans le résultat."></textarea><p class="field-hint">Ce champ reste privé entre vous et n’apparaît pas sur l’attestation publique.</p><div class="form-actions"><button type="submit" class="btn accent">Confirmer que ce travail a bien été réalisé</button></div></form>';
+}else{
+body+='<div class="cta-row left"><button class="btn secondary" id="pm-recheck">Vérifier à nouveau l’éligibilité</button><a class="btn secondary" href="espace.html?project='+project.id+'">Ouvrir l’espace de travail</a></div>';
+}
+}
+
+contentEl.innerHTML=head+body;
+
+if(status.issued&&!status.revoked){
+drawQr(status.certificate_code);
+document.getElementById("pm-print").addEventListener("click",function(){window.print();});
+document.getElementById("pm-revoke").addEventListener("click",async function(){
+var reason=prompt(pmT("Révoquer cette attestation est définitif. Indique le motif, il restera visible entre vous deux."));
+if(reason===null)return;
+var r=await client.rpc("revoke_certificate",{p_project_id:projectId,p_partner_id:partnerId,p_reason:(reason||"").trim()||null});
+if(r.error){alert(r.error.message);return;}
+render();});
+}
+
+const form=document.getElementById("pm-confirm-form");
+if(form){form.addEventListener("submit",async function(ev){ev.preventDefault();var btn=form.querySelector("button");btn.disabled=true;
+var reflection=document.getElementById("pm-reflection").value.trim()||null;
+var r=await client.rpc("confirm_completion",{p_project_id:projectId,p_partner_id:partnerId,p_reflection:reflection});
+if(r.error){alert(r.error.message);btn.disabled=false;return;}
+render();});}
+
+const recheck=document.getElementById("pm-recheck");
+if(recheck){recheck.addEventListener("click",async function(){recheck.disabled=true;
+var r=await client.rpc("confirm_completion",{p_project_id:projectId,p_partner_id:partnerId,p_reflection:null});
+if(r.error){alert(r.error.message);}
+render();});}
+}
+(async function(){await pmInitNav(null);await render();})();
+</script>
+</body>
+</html>

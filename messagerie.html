@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Messagerie : Polymatch</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex"><link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#136577">
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<a class="pm-skip" href="#contenu">Aller au contenu</a>
+<div id="pm-nav"></div>
+<main id="contenu" tabindex="-1">
+<div class="wrap wide hero">
+<span class="eyebrow">Messagerie</span>
+<h1>Conversations</h1>
+<p class="sub">Le premier message est toujours le plus dur à envoyer. Quand un fil est vide, trois débuts de message sont proposés : un clic, le texte se glisse dans le champ, il ne reste plus qu’à l’adapter. Les réponses arrivent ensuite sans recharger la page.</p>
+</div>
+<div class="wrap wide">
+<div id="pm-msg" class="msg-box" style="display:none;"></div>
+<div class="msg-layout">
+<div id="pm-conv-list"><p class="empty-note">Chargement…</p></div>
+<div id="pm-thread"></div>
+</div>
+</div>
+</main>
+<div id="pm-footer"></div>
+<script src="outils/supabase-js-2.117.1.js"></script>
+<script src="app.js"></script>
+<script>
+const msgEl=document.getElementById("pm-msg");const listEl=document.getElementById("pm-conv-list");const threadEl=document.getElementById("pm-thread");
+let session=null;let allMessages=[];let activeId=null;let activeProject=null;let channel=null;let profileCache={};
+function qp(){return new URLSearchParams(window.location.search);}
+async function loadAllMessages(){const uid=session.user.id;const r=await client.from("messages").select("id,sender_id,recipient_id,project_id,content,created_at,read_at,sender:profiles!messages_sender_id_fkey(full_name,discipline),recipient:profiles!messages_recipient_id_fkey(full_name,discipline),projects(id,title)").or("sender_id.eq."+uid+",recipient_id.eq."+uid).order("created_at",{ascending:true});if(r.error){pmShowMessage(msgEl,pmT("Erreur de chargement : {m}").replace("{m}",r.error.message),"error");return [];}return r.data||[];}
+function conversationsFrom(messages){const uid=session.user.id;const map=new Map();messages.forEach(function(m){const otherId=(m.sender_id===uid)?m.recipient_id:m.sender_id;const other=(m.sender_id===uid)?m.recipient:m.sender;const entry=map.get(otherId)||{otherId:otherId,name:null,discipline:null,last:m,unread:0};if(other&&other.full_name){entry.name=other.full_name;entry.discipline=other.discipline||null;}entry.last=m;if(m.recipient_id===uid&&!m.read_at)entry.unread+=1;map.set(otherId,entry);});return Array.from(map.values()).sort(function(a,b){return new Date(b.last.created_at)-new Date(a.last.created_at);});}
+async function markThreadRead(otherId){const uid=session.user.id;const ids=allMessages.filter(function(m){return m.sender_id===otherId&&m.recipient_id===uid&&!m.read_at;}).map(function(m){return m.id;});if(ids.length===0)return;const now=new Date().toISOString();const r=await client.from("messages").update({read_at:now}).in("id",ids);if(!r.error){allMessages=allMessages.map(function(m){return ids.indexOf(m.id)!==-1?Object.assign({},m,{read_at:now}):m;});}}
+function renderList(conversations){if(conversations.length===0){listEl.innerHTML='<div class="id-card"><p class="empty-note">Aucune conversation pour l’instant. Les échanges démarrent depuis un profil ou une fiche projet : ouvre <a href="membres.html">l’annuaire des membres</a>, choisis quelqu’un, et clique sur « Écrire à ».</p></div>';return;}
+listEl.innerHTML='<h3>Tes échanges</h3>'+conversations.map(function(c){const name=c.name||"Membre";const preview=c.last.content.length>52?c.last.content.slice(0,52)+"…":c.last.content;const mine=(c.last.sender_id===session.user.id)?(pmV("Toi :","Vous :")+" "):"";const pill=c.unread>0?'<span class="conv-count">'+c.unread+"</span>":"";
+return '<a class="conv-item'+(c.otherId===activeId?" current":"")+(c.unread>0?" unread":"")+'" href="messagerie.html?to='+c.otherId+'">'+pmAvatar(name)+'<div class="c-body"><div class="c-top"><span class="name">'+pmEscape(name)+pill+'</span><span class="when">'+pmRelativeTime(c.last.created_at)+'</span></div><div class="preview">'+pmEscape(mine+preview)+"</div></div></a>";}).join("");}
+function renderThread(other){
+if(!activeId){threadEl.innerHTML='<div class="example"><div class="ex-tag">Comment ça marche</div><p>Choisis une conversation à gauche, ou démarre un échange depuis un profil de <a href="membres.html">l’annuaire</a>. Un conseil qui change tout : au premier message, dis ta discipline, ce que tu peux faire concrètement, et pose une question précise. Un message qui n’appelle aucune réponse reste sans réponse.</p></div><div class="compare"><div class="compare-col bad"><div class="c-head">Message qui tombe à plat</div><p>« Salut, ton projet a l’air intéressant, on peut en discuter ? » Il n’y a rien à quoi répondre.</p></div><div class="compare-col good"><div class="c-head">Message qui obtient une réponse</div><p>« Je suis en M1 de statistiques. Tu dis manquer d’outils pour tes 4 000 messages : je peux construire le graphe et tester deux modèles. As-tu gardé les horodatages ? »</p></div></div>';return;}
+const uid=session.user.id;
+const thread=allMessages.filter(function(m){return (m.sender_id===uid&&m.recipient_id===activeId)||(m.sender_id===activeId&&m.recipient_id===uid);});
+const name=(other&&other.full_name)||"Membre";
+const disc=(other&&other.discipline)||null;
+let ctx=null;thread.forEach(function(m){if(m.projects&&m.projects.title)ctx=m.projects;});
+const ctxHtml=ctx?'<p class="thread-ctx">Cette conversation est rattachée au projet <a href="projet.html?id='+ctx.id+'">'+pmEscape(ctx.title)+"</a>.</p>":"";
+const msgsHtml=thread.map(function(m){const mine=(m.sender_id===uid);return '<div class="thread-msg'+(mine?" mine":"")+'"><p>'+pmEscape(m.content)+'</p><div class="meta">'+(mine?pmV("Toi","Vous"):pmEscape(name))+' · <span class="when">'+pmRelativeTime(m.created_at)+"</span>"+(mine?"":" · "+pmReportLink("message",m.id))+"</div></div>";}).join("");
+const starters=[pmV("Bonjour, je suis en [discipline] et ton travail m’intéresse. Concrètement je pense pouvoir t’aider sur [point précis]. Est-ce que ça correspond à ce que tu cherches ?","Bonjour, nous sommes en [discipline] et votre travail nous intéresse. Concrètement nous pensons pouvoir vous aider sur [point précis]. Est-ce que cela correspond à ce que vous cherchez ?"),pmV("Salut, je viens d’une discipline différente de la tienne et c’est justement pour ça que ton sujet m’intrigue. Ce que je sais faire : [compétence]. On en discute ?","Bonjour, nous venons d’une discipline différente de la vôtre et c’est justement pour cela que votre sujet nous intrigue. Ce que nous savons faire : [compétence]. En discutons-nous ?"),pmV("Bonjour, avant de me lancer j’aimerais qu’on cadre les objectifs et le temps que ça demande. Tu vises quoi comme résultat, et pour quand ?","Bonjour, avant de nous lancer nous aimerions cadrer les objectifs et le temps que cela demande. Quel résultat visez-vous, et pour quand ?")];
+const startersHtml=!msgsHtml?'<p class="field-hint">Choisis un début de message, il se glissera dans le champ ci-dessous : à toi de l’adapter.</p><div class="starter-row">'+starters.map(function(s,i){return '<button type="button" class="starter-chip" data-starter="'+i+'">'+pmEscape(s)+"</button>";}).join("")+"</div>":"";
+threadEl.innerHTML='<div class="thread-head">'+pmAvatar(name)+'<div class="t-body"><h3>'+pmEscape(name)+"</h3>"+(disc?'<div class="meta">'+pmEscape(disc)+"</div>":"")+'</div><a class="btn secondary small" href="profil-public.html?id='+activeId+'">Voir son profil</a></div>'
++ctxHtml
++(msgsHtml?'<div class="msg-scroll" id="pm-scroll">'+msgsHtml+"</div>":'<p class="empty-note">Aucun message pour l’instant. Pars d’un exemple ci-dessous, puis personnalise-le.</p>')
++startersHtml
++'<form class="card" id="pm-send-form"><label for="pm-send-content">Message</label><textarea id="pm-send-content" required placeholder="'+pmV("Ta discipline, ce que tu peux apporter, et une question précise.","Votre discipline, ce que vous pouvez apporter, et une question précise.")+'"></textarea><div class="form-actions"><button type="submit" class="btn accent">Envoyer</button><span class="field-hint" style="margin:0;"><span class="live-dot"></span>Les réponses apparaissent ici en direct.</span></div></form>';
+pmBindReports(threadEl);
+const sc=document.getElementById("pm-scroll");if(sc)sc.scrollTop=sc.scrollHeight;
+threadEl.querySelectorAll("[data-starter]").forEach(function(chip){chip.addEventListener("click",function(){const ta=document.getElementById("pm-send-content");ta.value=starters[Number(chip.getAttribute("data-starter"))];ta.focus();});});
+document.getElementById("pm-send-form").addEventListener("submit",async function(e){e.preventDefault();const ta=document.getElementById("pm-send-content");const content=ta.value.trim();if(!content)return;const btn=e.target.querySelector("button");btn.disabled=true;const r=await client.from("messages").insert({sender_id:uid,recipient_id:activeId,project_id:activeProject||null,content:content});btn.disabled=false;if(r.error){pmShowMessage(msgEl,r.error.message,"error");return;}ta.value="";await refresh();});
+}
+async function resolveOther(){if(!activeId)return null;if(profileCache[activeId])return profileCache[activeId];const conv=conversationsFrom(allMessages).find(function(c){return c.otherId===activeId;});if(conv&&conv.name){profileCache[activeId]={full_name:conv.name,discipline:conv.discipline};return profileCache[activeId];}const r=await client.from("profiles").select("full_name,discipline").eq("id",activeId).maybeSingle();profileCache[activeId]=r.data||null;return profileCache[activeId];}
+async function refresh(){allMessages=await loadAllMessages();if(activeId)await markThreadRead(activeId);renderList(conversationsFrom(allMessages));renderThread(await resolveOther());pmRefreshUnreadBadge(session.user.id);}
+function subscribeLive(){if(channel)return;channel=client.channel("pm-messages").on("postgres_changes",{event:"*",schema:"public",table:"messages"},function(payload){const row=payload.new||payload.old;if(!row)return;if(row.sender_id!==session.user.id&&row.recipient_id!==session.user.id)return;refresh();}).subscribe();}
+(async function(){session=await pmInitNav("messagerie.html");if(!session){window.location.href="connexion.html?next=messagerie.html";return;}activeId=qp().get("to");activeProject=qp().get("project");await refresh();subscribeLive();})();
+</script>
+</body>
+</html>

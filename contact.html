@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Contact : Polymatch</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Écrire à l’équipe de Polymatch : question, signalement, demande concernant vos données."><link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#136577">
+<link rel="canonical" href="https://polymatch.org/contact.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Polymatch">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://polymatch.org/contact.html">
+<meta property="og:title" content="Contact : Polymatch">
+<meta property="og:description" content="Écrire à l’équipe de Polymatch : question, signalement, demande concernant vos données.">
+<meta property="og:image" content="https://polymatch.org/apercu.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Polymatch, interdisciplinaire. Trouve la bonne personne, dans un autre domaine, pour ton prochain projet.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://polymatch.org/apercu.png">
+<meta name="twitter:title" content="Contact : Polymatch">
+<meta name="twitter:description" content="Écrire à l’équipe de Polymatch : question, signalement, demande concernant vos données.">
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<a class="pm-skip" href="#contenu">Aller au contenu</a>
+<div id="pm-nav"></div>
+<main id="contenu" tabindex="-1">
+<div class="wrap narrow hero">
+<span class="eyebrow">Nous écrire</span>
+<h1>Contact</h1>
+<p class="sub">Une question, un problème, une demande concernant vos données : ce formulaire arrive directement à l’administration du site.</p>
+</div>
+<div class="wrap narrow">
+<div id="pm-msg" class="msg-box" style="display:none;"></div>
+
+<form class="card" id="pm-contact-form">
+<label for="pm-name">Votre nom</label>
+<input type="text" id="pm-name" maxlength="200" placeholder="Camille Diallo">
+<label for="pm-email">Votre adresse e-mail</label>
+<input type="email" id="pm-email" maxlength="320" placeholder="prenom.nom@universite.fr">
+<p class="field-hint">Nécessaire pour recevoir une réponse. Elle ne sert qu’à cela.</p>
+<label for="pm-subject">Objet</label>
+<input type="text" id="pm-subject" maxlength="300" placeholder="Signalement, question, données personnelles…">
+<label for="pm-message">Message</label>
+<textarea id="pm-message" required maxlength="5000" placeholder="Décrivez votre demande en quelques lignes. Pour un signalement, indiquez la page concernée."></textarea>
+<div style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;" aria-hidden="true"><label for="pm-site">Ne rien écrire ici</label><input type="text" id="pm-site" tabindex="-1" autocomplete="off"></div>
+<div class="form-actions"><button type="submit" class="btn accent" id="pm-send">Envoyer</button><span class="field-hint" style="margin:0;">Réponse sous quelques jours.</span></div>
+</form>
+
+<div class="example">
+<div class="ex-tag">Autres moyens</div>
+<p>Vous pouvez aussi écrire directement à <a href="mailto:polymatch.contact@gmail.com">polymatch.contact@gmail.com</a>, notamment pour une demande officielle ou si ce formulaire ne fonctionne pas.</p>
+<p>Pour signaler un contenu précis, le plus rapide reste le lien « Signaler » présent sous chaque profil, projet, ouverture, réaction et message.</p>
+<p class="ex-meta">Voir aussi : <a href="mentions-legales.html">mentions légales</a>, <a href="confidentialite.html">confidentialité</a>, <a href="conditions.html">conditions d’utilisation</a>.</p>
+</div>
+</div>
+</main>
+<div id="pm-footer"></div>
+<script src="outils/supabase-js-2.117.1.js"></script>
+<script src="app.js"></script>
+<script>
+const msgEl=document.getElementById("pm-msg");
+document.getElementById("pm-contact-form").addEventListener("submit",async function(e){
+e.preventDefault();
+const btn=document.getElementById("pm-send");
+const val=function(id){return document.getElementById(id).value.trim();};
+if(!val("pm-message")){pmShowMessage(msgEl,pmT("Le message est vide."),"error");return;}
+btn.disabled=true;pmShowMessage(msgEl,pmT("Envoi en cours…"),"ok");
+try{
+const r=await client.functions.invoke("contact",{body:{name:val("pm-name"),email:val("pm-email"),subject:val("pm-subject"),message:val("pm-message"),site:val("pm-site")}});
+if(r.error){let m="";try{const b=await r.error.context.json();m=b&&b.error;}catch(x){}throw new Error(m||pmT("Le message n’a pas pu partir. Réessayer dans un instant."));}
+document.getElementById("pm-contact-form").reset();
+pmShowMessage(msgEl,pmT("Message envoyé. Une réponse suivra à l’adresse indiquée."),"ok");
+}catch(err){pmShowMessage(msgEl,String(err.message||err),"error");}
+finally{btn.disabled=false;}
+});
+pmInitNav("contact.html");
+</script>
+</body>
+</html>

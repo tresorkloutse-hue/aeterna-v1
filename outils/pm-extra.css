@@ -1,0 +1,56 @@
+/* Polymatch : complements de style charges par app.js sur toutes les pages.
+   style.css depasse la taille que l outil de deploiement accepte : les regles
+   nouvelles viennent donc ici, ce qui evite aussi de toucher chaque page. */
+
+/* ---- lien d evitement, visible seulement au clavier ---- */
+.pm-skip{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;z-index:200;background:#fff;color:var(--teal);border-radius:0 0 3px 0;font-family:"Lato",sans-serif;font-size:15px;font-weight:700;text-decoration:none;}
+.pm-skip:focus{width:auto;height:auto;margin:0;padding:10px 16px;overflow:visible;clip:auto;clip-path:none;border:1.5px solid var(--teal);left:0;top:0;}
+#contenu:focus{outline:none;}
+html[dir="rtl"] .pm-skip:focus{left:auto;right:0;border-radius:0 0 0 3px;}
+
+/* ---- menu replie sur petit ecran ---- */
+.nav-toggle{display:none;background:#fff;border:1.5px solid var(--line);border-radius:3px;color:var(--teal);font-family:"Lato",sans-serif;font-size:18px;line-height:1;padding:8px 12px;cursor:pointer;}
+.nav-toggle:hover{border-color:var(--teal);}
+.nav-toggle:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+@media(max-width:860px){
+.nav-toggle{display:inline-flex;align-items:center;justify-content:center;}
+.nav-inner.nav-has-toggle{flex-wrap:wrap;}
+.nav-has-toggle .links{display:none;flex:1 1 100%;}
+.nav-has-toggle.nav-open .links{display:flex;flex-direction:column;align-items:stretch;gap:0;margin-top:12px;padding-top:6px;border-top:1px solid var(--line);}
+.nav-has-toggle.nav-open .links a{padding:12px 2px;font-size:15px;border-bottom:1px solid var(--soft);}
+.nav-has-toggle.nav-open .links a.current{border-bottom:2px solid var(--accent);padding-bottom:10px;}
+.nav-has-toggle.nav-open .links .lang-select{margin:14px 0 4px;width:100%;}
+}
+
+/* ---- marque de fondateur ---- */
+.pm-fondateur{display:inline-block;vertical-align:middle;font-family:"Lato",sans-serif;font-size:10.5px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:2px;padding:3px 9px;white-space:nowrap;}
+.pm-fondateur.grand{font-size:11.5px;padding:5px 12px;letter-spacing:.14em;}
+html[dir="rtl"] .pm-fondateur{letter-spacing:0;}
+
+/* ---- barre de recherche des listes ---- */
+.pm-filters{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 18px;padding:14px 16px;background:var(--soft);border:1px solid var(--line);border-radius:3px;}
+.pm-filters-label{font-family:"Lato",sans-serif;font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);}
+.pm-filters input[type="search"]{flex:1 1 240px;min-width:0;max-width:460px;padding:10px 12px;border:1.5px solid var(--line);border-radius:3px;font-family:"Lato",sans-serif;font-size:15px;color:var(--ink);background:#fff;}
+.pm-filters select{width:auto;min-width:180px;padding:10px 12px;border:1.5px solid var(--line);border-radius:3px;font-family:"Lato",sans-serif;font-size:15px;color:var(--ink);background:#fff;max-width:100%;}
+.pm-filters input[type="search"]:focus,.pm-filters select:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal);}
+.pm-filters-note{flex:1 1 100%;margin:0;color:#6b7280;font-size:14px;}
+.pm-more{margin:18px 0 0;text-align:center;}
+.pm-more:empty{margin:0;}
+@media(max-width:600px){
+.pm-filters{gap:8px;padding:12px;}
+.pm-filters input[type="search"],.pm-filters select{flex:1 1 100%;width:100%;}
+.pm-more .btn{width:100%;}
+}
+html[dir="rtl"] .pm-filters-note{text-align:right;}
+
+/* ---- un passage reste en francais alors que le site est dans une autre langue ---- */
+/* Sans cela, en arabe, la ponctuation francaise bascule du mauvais cote et les
+   lettres latines sont rendues par une police dessinee pour l ecriture arabe. */
+[lang="fr"]{direction:ltr;}
+html[dir="rtl"] [lang="fr"]{text-align:left;}
+/* style.css fixe l alignement sur chaque paragraphe : l heritage du conteneur
+   ne suffit pas, il faut viser les memes elements. Le bandeau de titre garde
+   son centrage. */
+html[dir="rtl"] [lang="fr"]:not(.hero) p,html[dir="rtl"] [lang="fr"]:not(.hero) li,html[dir="rtl"] [lang="fr"]:not(.hero) .meta,html[dir="rtl"] [lang="fr"]:not(.hero) .field-hint,html[dir="rtl"] [lang="fr"]:not(.hero) .empty-note{text-align:left;}
+html[dir="rtl"] [lang="fr"],html[dir="rtl"] [lang="fr"] p,html[dir="rtl"] [lang="fr"] li,html[dir="rtl"] [lang="fr"] em,html[dir="rtl"] [lang="fr"] strong,html[dir="rtl"] [lang="fr"] .btn,html[dir="rtl"] [lang="fr"] .meta,html[dir="rtl"] [lang="fr"] .sub{font-family:"Lato",sans-serif;}
+html[dir="rtl"] [lang="fr"] h1,html[dir="rtl"] [lang="fr"] h2,html[dir="rtl"] [lang="fr"] h3,html[dir="rtl"] [lang="fr"] .title-link{font-family:"Fahkwang","Lato",sans-serif;}

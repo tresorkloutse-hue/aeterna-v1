@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Connexion : Polymatch</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#136577">
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<a class="pm-skip" href="#contenu">Aller au contenu</a>
+<div id="pm-nav"></div>
+<main id="contenu" tabindex="-1">
+<div class="wrap narrow hero">
+<span class="eyebrow">Compte</span>
+<h1 id="pm-title">Se connecter</h1>
+<p class="sub" id="pm-sub">Une adresse email suffit. Deux clics et tu es dedans.</p>
+</div>
+<div class="wrap narrow">
+<div id="pm-msg" class="msg-box" style="display:none;"></div>
+<form class="card" id="pm-form">
+<label for="pm-email">Adresse email</label>
+<input type="email" id="pm-email" required placeholder="prenom.nom@universite.fr">
+<p class="field-hint">Ton adresse universitaire est idéale, mais n'importe quelle adresse fonctionne.</p>
+<label for="pm-password">Mot de passe</label>
+<input type="password" id="pm-password" required>
+<p class="field-hint" id="pm-pass-hint" style="display:none;">10 caractères minimum. Évite un mot de passe que tu utilises déjà ailleurs : s’il a fuité sur un autre site, il ne protège plus rien ici. Une phrase courte que toi seul peux écrire vaut mieux qu’un mot compliqué.</p>
+<div class="form-actions"><button type="submit" class="btn accent" id="pm-submit">Se connecter</button><button type="button" class="btn secondary" id="pm-toggle">Créer un compte plutôt</button></div>
+<p class="field-hint" id="pm-forgot-zone" style="margin-top:14px;"><a href="#" id="pm-forgot-link">Mot de passe oublié ?</a></p>
+</form>
+<p class="field-hint" id="pm-confirm-note" style="display:none;">Compte créé. Il reste une étape : ouvre ta boîte mail et clique sur le lien de confirmation, qui te ramènera ici, connecté, sur ta fiche à remplir. Sans cette confirmation, la connexion est refusée. Si le message tarde, regarde dans les indésirables.</p>
+<div class="example">
+<div class="ex-tag">Ce qui t'attend juste après</div>
+<p>Tu complètes ton profil en une minute (discipline, compétences, ce que tu cherches), puis tu peux parcourir les projets ouverts et postuler à ceux qui sortent de ta filière. Rien n'est publié en ton nom sans que tu le décides.</p>
+</div>
+</div>
+</main>
+<div id="pm-footer"></div>
+<script src="outils/supabase-js-2.117.1.js"></script>
+<script src="app.js"></script>
+<script>
+let mode="login";const form=document.getElementById("pm-form");const emailEl=document.getElementById("pm-email");const passEl=document.getElementById("pm-password");const msgEl=document.getElementById("pm-msg");const submitBtn=document.getElementById("pm-submit");const toggleBtn=document.getElementById("pm-toggle");const titleEl=document.getElementById("pm-title");const subEl=document.getElementById("pm-sub");const confirmNote=document.getElementById("pm-confirm-note");
+function params(){return new URLSearchParams(window.location.search);}
+function applyMode(){if(mode==="signup"){titleEl.textContent=pmT("Créer un compte");subEl.textContent=pmT("Un compte, une adresse email, et la porte est ouverte.");submitBtn.textContent=pmT("Créer mon compte");toggleBtn.textContent=pmT("J'ai déjà un compte");document.getElementById("pm-forgot-zone").style.display="none";document.getElementById("pm-pass-hint").style.display="block";}else{titleEl.textContent=pmT("Se connecter");subEl.textContent=pmT("Une adresse email suffit. Deux clics et tu es dedans.");submitBtn.textContent=pmT("Se connecter");toggleBtn.textContent=pmT("Créer un compte plutôt");document.getElementById("pm-forgot-zone").style.display="block";document.getElementById("pm-pass-hint").style.display="none";}pmShowMessage(msgEl,"");confirmNote.style.display="none";}
+document.getElementById("pm-forgot-link").addEventListener("click",async(e)=>{e.preventDefault();const email=emailEl.value.trim();if(!email){pmShowMessage(msgEl,"Indique d'abord ton adresse email ci-dessus.","error");return;}const{error}=await client.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+"/reinitialiser.html"});if(error){pmShowMessage(msgEl,error.message,"error");return;}pmShowMessage(msgEl,pmT("Si un compte existe avec cette adresse, un email de réinitialisation vient d'être envoyé."),"ok");});
+toggleBtn.addEventListener("click",()=>{mode=mode==="login"?"signup":"login";applyMode();});
+form.addEventListener("submit",async(e)=>{e.preventDefault();pmShowMessage(msgEl,"");confirmNote.style.display="none";submitBtn.disabled=true;const email=emailEl.value.trim();const password=passEl.value;if(mode==="signup"){if(password.length<10){submitBtn.disabled=false;pmShowMessage(msgEl,pmT("Un mot de passe de 10 caractères au moins, sinon il se devine trop vite."),"error");return;}const{data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo:window.location.origin+"/profil.html"}});submitBtn.disabled=false;if(error){pmShowMessage(msgEl,error.message,"error");return;}
+// Adresse deja inscrite : Supabase repond comme si tout allait bien, pour qu un
+// inconnu ne puisse pas savoir qui a un compte. La liste des identites vide est
+// le seul signe. Sans ce test, la page promettrait un e-mail qui ne part jamais.
+if(data.user&&Array.isArray(data.user.identities)&&data.user.identities.length===0){mode="login";applyMode();emailEl.value=email;pmShowMessage(msgEl,pmT("Cette adresse a déjà un compte. Connecte-toi ci-dessous, ou demande un nouveau mot de passe si tu l'as oublié."),"error");return;}
+if(data.session){window.location.href="profil.html";return;}pmShowMessage(msgEl,"Compte créé.","ok");confirmNote.style.display="block";}else{const{data,error}=await client.auth.signInWithPassword({email,password});submitBtn.disabled=false;if(error){pmShowMessage(msgEl,error.message,"error");return;}const next=params().get("next");window.location.href=next&&next!=="connexion.html"?next:"profil.html";}});
+(async()=>{const session=await pmInitNav("connexion.html");if(session){window.location.href="profil.html";return;}if(params().get("mode")==="signup"){mode="signup";}applyMode();})();
+</script>
+</body>
+</html>

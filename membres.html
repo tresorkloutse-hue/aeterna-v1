@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Annuaire des membres : Polymatch</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Qui est déjà sur Polymatch : étudiants et chercheurs, par discipline."><link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#136577">
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<a class="pm-skip" href="#contenu">Aller au contenu</a>
+<div id="pm-nav"></div>
+<main id="contenu" tabindex="-1">
+<div class="wrap wide hero">
+<span class="eyebrow">Annuaire</span>
+<h1>Qui est déjà là</h1>
+<p class="sub">Avant de publier quoi que ce soit, voir qui il y a à rencontrer. Chaque profil dit d’où la personne vient, ce qu’elle sait faire de concret, et ce qu’elle cherche. C’est souvent plus rapide que d’attendre une réponse à une annonce : lire, repérer, écrire.</p>
+</div>
+<div class="wrap wide">
+<div id="pm-filters" class="filter-bar">
+<div class="f-field"><label for="pm-search">Chercher un nom, une compétence, un mot</label><input type="text" id="pm-search" placeholder="statistiques, QGIS, droit public, Nantes..."></div>
+<div class="f-field"><label for="pm-discipline">Filtrer par discipline</label><select id="pm-discipline"><option value="">Toutes les disciplines</option></select></div>
+<div class="f-field"><label for="pm-kind">Type de compte</label><select id="pm-kind"><option value="">Personnes et institutions</option><option value="personne">Personnes seulement</option><option value="institution">Institutions seulement</option></select></div>
+</div>
+<p class="count-note" id="pm-count"></p>
+<div id="pm-msg" class="msg-box" style="display:none;"></div>
+<div class="member-grid" id="pm-list"><p class="empty-note">Chargement de l'annuaire...</p></div>
+<div class="pm-more" id="pm-more"></div>
+<div class="example" style="margin-top:40px;">
+<div class="ex-tag">Comment se servir de l'annuaire</div>
+<p>L'annuaire mêle deux types de comptes : des personnes, qui cherchent un binôme pour leur propre travail, et des institutions, signalées par un badge, qui accueillent des stagiaires et des doctorants. Le filtre en haut permet de ne voir que l'un ou l'autre.</p>
+<p>Ne pas chercher quelqu’un « d’intéressant », mais une compétence qui manque. Des entretiens à coder sans savoir les analyser : filtrer sur statistiques ou sociologie quantitative. Un modèle mais aucune donnée : chercher les profils de terrain. Puis écrire en disant ce qui a déjà été fait et ce qui bloque, pas seulement bonjour.</p>
+</div>
+</div>
+</main>
+<div id="pm-footer"></div>
+<script src="outils/supabase-js-2.117.1.js"></script>
+<script src="app.js"></script>
+<script>
+const listEl=document.getElementById("pm-list");const msgEl=document.getElementById("pm-msg");const countEl=document.getElementById("pm-count");const searchEl=document.getElementById("pm-search");const discEl=document.getElementById("pm-discipline");const kindEl=document.getElementById("pm-kind");
+let all=[];let myId=null;
+const moreEl=document.getElementById("pm-more");const PAGE=24;let shown=PAGE;
+function applyFromStart(){shown=PAGE;apply();}
+function card(p){const skills=(p.skills||[]).slice(0,4).map(function(s){return '<span class="tag">'+pmEscape(s)+"</span>";}).join("");const isMe=myId&&p.id===myId;const org=pmIsOrg(p);const sub=org?[pmOrgKind(p.org_kind),p.country].filter(Boolean).join(" · "):p.university;return '<a class="member-card" href="profil-public.html?id='+p.id+'"><div class="m-top">'+pmAvatar(p.full_name,null,org)+'<div><div class="m-name">'+pmEscape(p.full_name)+(isMe?' <span class="meta" style="font-weight:400;">'+pmT("(toi)")+"</span>":"")+(p.founder?' <span class="pm-fondateur" title="'+pmEscape(pmT("A fondé Polymatch"))+'">'+pmT("Fondateur")+"</span>":"")+"</div>"+(org?'<div style="margin-top:5px;"><span class="org-badge">Institution</span></div>':"")+(p.discipline?'<div class="m-disc">'+pmEscape(p.discipline)+"</div>":"")+"</div></div>"+(sub?'<div class="meta">'+pmEscape(sub)+"</div>":"")+(p.bio?'<div class="m-bio">'+pmEscape(p.bio)+"</div>":'<div class="m-bio" style="color:#9aa4ab;">Profil encore sans description.</div>')+(skills?'<div class="tags">'+skills+"</div>":"")+"</a>";}
+function apply(){const q=searchEl.value.trim().toLowerCase();const d=discEl.value;const k=kindEl.value;const rows=all.filter(function(p){if(k&&(p.account_type||"personne")!==k)return false;if(d&&(p.discipline||"")!==d)return false;if(!q)return true;const hay=[p.full_name,p.discipline,p.university,p.bio,p.availability,p.country,pmIsOrg(p)?"institution "+pmOrgKind(p.org_kind):"",(p.skills||[]).join(" ")].join(" ").toLowerCase();return hay.indexOf(q)!==-1;});const nd=new Set(all.map(function(p){return p.discipline;}).filter(Boolean)).size;const norg=all.filter(pmIsOrg).length;countEl.textContent=(rows.length===all.length)?(pmT(all.length>1?"{n} membres":"{n} membre").replace("{n}",all.length)+(norg?" "+pmT(norg>1?"dont {n} institutions":"dont {n} institution").replace("{n}",norg):"")+", "+pmT(nd>1?"{n} disciplines représentées":"{n} discipline représentée").replace("{n}",nd)):(pmT(rows.length>1?"{a} profils correspondent sur {b}":"{a} profil correspond sur {b}").replace("{a}",rows.length).replace("{b}",all.length));const page=rows.slice(0,shown);listEl.innerHTML=rows.length?page.map(card).join(""):'<p class="empty-note">Aucun profil ne correspond. Essaie un mot plus large, ou enlève le filtre de discipline.</p>';const reste=rows.length-page.length;moreEl.innerHTML=reste>0?'<button type="button" class="btn secondary" id="pm-more-btn">'+(reste===1?pmT("Voir le dernier membre"):pmT("Voir plus de membres ({n} restants)").replace("{n}",reste))+"</button>":"";}
+(async function(){const session=await pmInitNav("membres.html");
+if(!session){document.getElementById("pm-filters").style.display="none";listEl.innerHTML='<p class="empty-note">Les profils ne sont pas publics : ils ne sont visibles que par les autres membres, et jamais par un moteur de recherche. <a href="connexion.html?next=membres.html">Connecte-toi</a> pour ouvrir l’annuaire.</p>';return;}
+myId=session.user.id;
+const r=await client.from("profiles").select("id,full_name,discipline,university,bio,skills,availability,account_type,org_kind,country,founder").order("created_at",{ascending:false});
+if(r.error){pmShowMessage(msgEl,pmT("Erreur de chargement : {m}").replace("{m}",r.error.message),"error");listEl.innerHTML="";return;}
+all=r.data||[];
+if(all.length===0){listEl.innerHTML='<p class="empty-note">Aucun profil complété pour l’instant. <a href="profil.html">Remplis le tien</a> : tu seras le premier, et c’est lui que les suivants liront.</p>';countEl.textContent="";return;}
+Array.from(new Set(all.map(function(p){return p.discipline;}).filter(Boolean))).sort().forEach(function(d){const o=document.createElement("option");o.value=d;o.textContent=d;discEl.appendChild(o);});
+searchEl.addEventListener("input",applyFromStart);discEl.addEventListener("change",applyFromStart);kindEl.addEventListener("change",applyFromStart);document.addEventListener("click",function(e){if(e.target.closest("#pm-more-btn")){shown+=PAGE;apply();}});apply();})();
+</script>
+</body>
+</html>

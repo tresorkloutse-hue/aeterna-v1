@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Ouverture : Polymatch</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#136577">
+<meta name="description" content="Un travail achevé proposé à d'autres disciplines pour qu'elles le prolongent.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Polymatch">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:image" content="https://polymatch.org/apercu.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://polymatch.org/apercu.png">
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<a class="pm-skip" href="#contenu">Aller au contenu</a>
+<div id="pm-nav"></div>
+<main id="contenu" tabindex="-1">
+<div class="wrap" id="pm-content"><p class="empty-note">Chargement…</p></div>
+</main>
+<div id="pm-footer"></div>
+<script src="outils/supabase-js-2.117.1.js"></script>
+<script src="app.js"></script>
+<script>
+const contentEl=document.getElementById("pm-content");let session=null;
+function openingId(){return new URLSearchParams(window.location.search).get("id");}
+async function loadComments(openingId){const{data,error}=await client.from("opening_comments").select("id,content,created_at,author_id,profiles(full_name)").eq("opening_id",openingId).order("created_at",{ascending:true});if(error){return '<div class="msg-box error">'+pmEscape(error.message)+"</div>";}if(!data||data.length===0){return '<p class="empty-note">Aucune réaction pour l’instant. Si ce travail t’intéresse, explique en deux phrases ce que ta discipline pourrait en faire.</p>';}return data.map((c)=>{const author=pmAuthorLink(c.author_id,c.profiles&&c.profiles.full_name);const mineC=session&&c.author_id===session.user.id;return('<div class="thread-msg'+(mineC?" mine":"")+'"><p>'+pmEscape(c.content)+"</p>"+'<div class="meta">'+author+" · "+pmFormatDate(c.created_at)+((session&&!mineC)?" · "+pmReportLink("comment",c.id):"")+"</div></div>");}).join("");}
+// Vue d un visiteur sans compte, pour une ouverture que son auteur a choisi de
+// rendre lisible par tout le monde. Ni reactions, ni lien vers un profil, ni
+// messagerie : seulement le texte propose, et l invitation a entrer.
+// Une ouverture lisible sans compte merite ses propres balises : sans elles,
+// un moteur et un reseau social ne voient que le gabarit vide de la page.
+function pmMeta(sel,attr,cle,valeur){var e=document.head.querySelector(sel);if(!e){e=document.createElement("meta");e.setAttribute(attr,cle);document.head.appendChild(e);}e.setAttribute("content",valeur);}
+function pmBalises(o){
+var titre=o.title+" : Polymatch";
+var resume=String(o.description||"").slice(0,180);
+var adresse="https://polymatch.org/ouverture.html?id="+encodeURIComponent(o.id);
+document.title=titre;
+var lien=document.head.querySelector('link[rel="canonical"]');
+if(!lien){lien=document.createElement("link");lien.setAttribute("rel","canonical");document.head.appendChild(lien);}
+lien.setAttribute("href",adresse);
+pmMeta('meta[name="description"]',"name","description",resume);
+pmMeta('meta[property="og:url"]',"property","og:url",adresse);
+pmMeta('meta[property="og:title"]',"property","og:title",titre);
+pmMeta('meta[property="og:description"]',"property","og:description",resume);
+pmMeta('meta[name="twitter:title"]',"name","twitter:title",titre);
+pmMeta('meta[name="twitter:description"]',"name","twitter:description",resume);
+}
+function renderPublique(o){
+pmBalises(o);
+const tags=(o.disciplines_sought||[]).map(function(s){return '<span class="tag">'+pmEscape(s)+"</span>";}).join("");
+contentEl.innerHTML='<span class="eyebrow left">Ouverture</span>'
++'<h1 style="text-align:left;">'+pmEscape(o.title)+"</h1>"
++'<p class="meta">'+pmT("Par")+" "+pmEscape(o.author_name)+(o.discipline_origin?" · "+pmEscape(o.discipline_origin):"")+" · "+pmFormatDate(o.created_at)+"</p>"
++'<p class="sub">'+pmEscape(o.description)+"</p>"
++(tags?'<div class="tags">'+tags+"</div>":"")
++'<div class="id-card" style="margin-top:22px;"><p class="field-hint" style="margin:0 0 8px;">'+pmT("Ce que vous lisez")+'</p><p style="margin:0 0 12px;">'+pmT("Un travail achevé, que son auteur propose à d’autres disciplines pour qu’elles le prolongent. Réagir, écrire à l’auteur et lire les réactions des autres membres demandent un compte, gratuit.")+'</p><div class="cta-row left"><a class="btn accent" href="connexion.html?mode=signup">'+pmT("Créer un compte gratuit")+'</a><a class="btn secondary" href="ouvertures.html">'+pmT("Voir les autres ouvertures")+"</a></div></div>";
+}
+
+async function render(){const id=openingId();if(!id){contentEl.innerHTML='<p class="empty-note">Ouverture introuvable.</p>';return;}const{data:opening,error}=await client.from("openings").select("id,title,description,discipline_origin,disciplines_sought,status,created_at,author_id,project_id,is_public,profiles(full_name,discipline),projects(title)").eq("id",id).maybeSingle();if(error||!opening){
+// la base a refuse la ligne : c est peut-etre une ouverture que son auteur a
+// rendue lisible sans compte, auquel cas une fonction dediee la donne, sans
+// les reactions ni rien qui concerne les autres membres
+const pub=await client.rpc("pm_ouverture_publique",{p_id:id});
+const o=(pub&&pub.data&&pub.data.trouvee!==false)?pub.data:null;
+if(o){renderPublique(o);return;}
+contentEl.innerHTML='<p class="empty-note">Ouverture introuvable, ou réservée aux membres connectés.</p>';return;}const author=pmAuthorLink(opening.author_id,opening.profiles&&opening.profiles.full_name);const isAuthor=session&&session.user.id===opening.author_id;const tags=(opening.disciplines_sought||[]).map((s)=>'<span class="tag">'+pmEscape(s)+"</span>").join("");const projectLink=opening.project_id&&opening.projects?'<p class="meta">Lié au projet : <a href="projet.html?id='+opening.project_id+'">'+pmEscape(opening.projects.title)+"</a></p>":"";const commentsHtml=await loadComments(id);let commentFormHtml="";if(session){commentFormHtml='<div class="example"><div class="ex-tag">Comment réagir utilement</div><p>Dis de quelle discipline tu viens, ce que tu crois pouvoir apporter concrètement à ce travail, et une question que tu te poses en le lisant. Exemple : « Je viens de l’économie comportementale. Tes cas de réciprocité différée ressemblent à des jeux répétés avec réputation : je pourrais tester ça sur tes données. As-tu gardé les délais entre échanges ? »</p></div><form class="card" id="pm-comment-form"><label for="pm-comment-content">Réagir à cette ouverture</label><textarea id="pm-comment-content" required placeholder="Ta discipline, ce que tu pourrais apporter, et une question sur le travail."></textarea><div class="form-actions"><button type="submit" class="btn accent">Publier ma réaction</button></div></form>';}else{commentFormHtml='<p class="empty-note"><a href="connexion.html?next='+encodeURIComponent("ouverture.html?id="+id)+'">Connecte-toi</a> pour réagir à cette ouverture.</p>';}const writeHtml=(session&&!isAuthor)?'<div class="cta-row left"><a class="btn secondary" href="messagerie.html?to='+opening.author_id+'">Écrire à l’auteur en privé</a><a class="btn secondary" href="profil-public.html?id='+opening.author_id+'">Voir son profil</a></div>':"";const closeButtonHtml=isAuthor?'<div class="cta-row left">'+(opening.status==="open"?'<button class="btn secondary small" id="pm-close-opening">Marquer comme clôturée</button>':"")+'<button class="btn secondary small" id="pm-toggle-public">'+(opening.is_public?pmT("Rendre privée"):pmT("Rendre lisible sans compte"))+'</button></div>'+(opening.is_public?'<p class="field-hint">'+pmT("Cette ouverture est lisible par tout le monde, sans compte, et peut apparaître dans les moteurs de recherche.")+"</p>":""):"";contentEl.innerHTML='<span class="eyebrow left">Ouverture</span>'+'<h1 style="text-align:left;">'+pmEscape(opening.title)+"</h1>"+'<p class="meta">Par '+author+(opening.discipline_origin?" · "+pmEscape(opening.discipline_origin):"")+' · <span class="badge '+opening.status+'">'+(opening.status==="open"?"ouverte":"clôturée")+"</span></p>"+'<p class="sub">'+pmEscape(opening.description)+"</p>"+(tags?'<div class="tags">'+tags+"</div>":"")+projectLink+writeHtml+closeButtonHtml+'<h2 class="section-title">Réactions</h2>'+commentsHtml+commentFormHtml;const form=document.getElementById("pm-comment-form");if(form){form.addEventListener("submit",async(e)=>{e.preventDefault();const btn=form.querySelector("button");btn.disabled=true;const content=document.getElementById("pm-comment-content").value.trim();if(!content){btn.disabled=false;return;}const{error}=await client.from("opening_comments").insert({opening_id:id,author_id:session.user.id,content:content});if(error){alert(error.message);btn.disabled=false;return;}render();});}if(session&&!isAuthor){const rz=document.createElement("p");rz.className="meta";rz.style.marginTop="24px";rz.innerHTML="Cette ouverture pose un problème ? "+pmReportLink("opening",opening.id);contentEl.appendChild(rz);}
+pmBindReports(contentEl);
+const closeBtn=document.getElementById("pm-close-opening");if(closeBtn){closeBtn.addEventListener("click",async()=>{closeBtn.disabled=true;await client.from("openings").update({status:"closed"}).eq("id",id);render();});}
+const pubBtn=document.getElementById("pm-toggle-public");if(pubBtn){pubBtn.addEventListener("click",async()=>{pubBtn.disabled=true;await client.from("openings").update({is_public:!opening.is_public}).eq("id",id);render();});}}
+(async()=>{session=await pmInitNav(null);await render();})();
+</script>
+</body>
+</html>

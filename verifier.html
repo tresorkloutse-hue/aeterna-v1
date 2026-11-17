@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Vérifier une attestation : Polymatch</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Vérifie l'authenticité d'une attestation de collaboration Polymatch à partir de son code."><link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#136577">
+<link rel="canonical" href="https://polymatch.org/verifier.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Polymatch">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://polymatch.org/verifier.html">
+<meta property="og:title" content="Vérifier une attestation : Polymatch">
+<meta property="og:description" content="Vérifie l'authenticité d'une attestation de collaboration Polymatch à partir de son code.">
+<meta property="og:image" content="https://polymatch.org/apercu.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Polymatch, interdisciplinaire. Trouve la bonne personne, dans un autre domaine, pour ton prochain projet.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://polymatch.org/apercu.png">
+<meta name="twitter:title" content="Vérifier une attestation : Polymatch">
+<meta name="twitter:description" content="Vérifie l'authenticité d'une attestation de collaboration Polymatch à partir de son code.">
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<a class="pm-skip" href="#contenu">Aller au contenu</a>
+<div id="pm-nav"></div>
+<main id="contenu" tabindex="-1">
+<div class="wrap narrow hero">
+<span class="eyebrow">Vérification publique</span>
+<h1>Vérifier une attestation</h1>
+<p class="sub">Pas de blabla : colle le code, on te dit si l'attestation est authentique. Accessible à tous, sans compte, y compris aux jurys et recruteurs.</p>
+</div>
+<div class="wrap narrow">
+<form class="card" id="pm-verify-form">
+<label for="pm-code">Code de l'attestation</label>
+<input type="text" id="pm-code" placeholder="PM-A1B2C3D4E5" required>
+<p class="field-hint">Le code figure en bas de l'attestation, au format PM- suivi de dix caractères. Copie-le en entier, sans espace.</p>
+<div class="form-actions"><button type="submit" class="btn accent">Vérifier</button></div>
+</form>
+<div id="pm-result" class="verify-result"></div>
+<div class="example">
+<div class="ex-tag">Ce que la vérification prouve</div>
+<p>Qu'une collaboration interdisciplinaire a bien eu lieu sur la plateforme, entre des personnes nommées et sur un projet identifié, et qu'elle a laissé des traces réelles : du temps écoulé, des échanges avec l’équipe, un document que la personne a elle-même modifié dans l’espace partagé, et l’accord des deux parties. Une attestation nomme toute l’équipe, et chaque participant a la sienne.</p>
+</div>
+</div>
+</main>
+<div id="pm-footer"></div>
+<script src="outils/supabase-js-2.117.1.js"></script>
+<script src="app.js"></script>
+<script>
+const resultEl=document.getElementById("pm-result");
+function fmtDate(iso){try{return new Date(iso).toLocaleDateString(pmLocale(),{day:"numeric",month:"long",year:"numeric"});}catch(e){return "";}}
+async function verify(code){
+resultEl.innerHTML='<p class="empty-note">Vérification…</p>';
+const r=await client.rpc("verify_certificate",{p_code:code.trim()});
+if(r.error){resultEl.innerHTML='<div class="verify-bad"><strong>Erreur de vérification.</strong> '+pmEscape(r.error.message)+"</div>";return;}
+const d=r.data;
+if(!d||!d.valid){
+if(d&&d.reason==="revoked"){resultEl.innerHTML='<div class="verify-bad"><strong>Attestation révoquée.</strong> '+pmT("Ce code correspond à une attestation qui a été révoquée le {d} par l’une des deux parties. Elle ne vaut plus rien.").replace("{d}",fmtDate(d.revoked_at))+"</div>";return;}
+resultEl.innerHTML='<div class="verify-bad"><strong>Code inconnu.</strong> Aucune attestation valide ne correspond à ce code. Vérifie qu’il a été copié en entier, sans espace.</div>';return;}
+const team=d.team||[];
+const others=team.filter(function(m){return m.full_name!==d.holder_name;});
+const discs=[];team.forEach(function(m){if(m.discipline&&discs.indexOf(m.discipline)===-1)discs.push(m.discipline);});
+resultEl.innerHTML='<div class="verify-ok"><span class="eyebrow left" style="color:#1f6b33;">Attestation authentique</span>'
++"<h3>"+pmEscape(d.project_title)+"</h3>"
++"<p>"+(function(){var who="<strong>"+pmEscape(d.holder_name)+"</strong>"+(d.holder_discipline?(" ("+pmEscape(d.holder_discipline)+")"):"");if(others.length){var list=others.map(function(m){return "<strong>"+pmEscape(m.full_name)+"</strong>"+(m.discipline?(" ("+pmEscape(m.discipline)+")"):"");}).join(", ");return pmT("Attestation au nom de {who}, qui a mené ce travail à terme avec {autres}.").replace("{who}",who).replace("{autres}",list);}return pmT("Attestation au nom de {who}, qui a mené ce travail à terme.").replace("{who}",who);})()+"</p>"
++(discs.length>1?('<p class="meta">'+pmT("Disciplines réunies : {d}").replace("{d}",discs.map(pmEscape).join(" · "))+"</p>"):"")
++(d.started_at?('<p class="meta">'+pmT("Collaboration commencée le {d}").replace("{d}",fmtDate(d.started_at))+"</p>"):"")
++'<p class="meta">'+pmT("Délivrée le {d}").replace("{d}",fmtDate(d.issued_at))+" · "+pmT("Code")+' <span class="verify-code">'+pmEscape(d.certificate_code)+"</span></p></div>"
+// Celui qui verifie un code ne connait pas forcement Polymatch : c est souvent
+// un employeur ou un directeur de memoire. On lui dit en trois lignes ce qu il
+// vient de verifier, et ce que ca vaut.
++'<div class="id-card" style="margin-top:18px;"><p class="field-hint" style="margin:0 0 8px;">'+pmT("Ce que vous venez de vérifier")+'</p><p style="margin:0 0 10px;">'+pmT("Polymatch met en relation des étudiants et des chercheurs de disciplines différentes autour d’un projet. Une attestation n’est délivrée que si les deux personnes confirment le travail, après un délai et des échanges réels : elle ne peut pas être fabriquée par son porteur seul.")+'</p><p style="margin:0;"><a href="manifeste.html">'+pmT("Pourquoi ce site existe")+'</a> · <a href="index.html">'+pmT("Découvrir Polymatch")+"</a></p></div>";}
+document.getElementById("pm-verify-form").addEventListener("submit",(e)=>{e.preventDefault();verify(document.getElementById("pm-code").value);});
+(async()=>{await pmInitNav("verifier.html");const fromQuery=new URLSearchParams(window.location.search).get("code");if(fromQuery){document.getElementById("pm-code").value=fromQuery;verify(fromQuery);}})();
+</script>
+</body>
+</html>

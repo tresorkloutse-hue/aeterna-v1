@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Espace de travail : Polymatch</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#136577">
+<link rel="stylesheet" href="style.css"><style>table.sheet th{background:var(--soft);color:#6b7280;font-size:11.5px;font-weight:700;border:1px solid var(--line);padding:3px 5px;text-align:center;white-space:nowrap;min-width:34px;}table.sheet th.sh-corner{min-width:28px;}.sheet-del{border:none;background:none;color:#9aa4ab;cursor:pointer;font-size:13px;line-height:1;padding:0 2px;margin-left:4px;font-family:inherit;}.sheet-del:hover,.sheet-del:focus{color:var(--accent);}table.sheet input.is-num{text-align:right;}table.sheet input.is-formula{color:var(--teal);}table.sheet input.is-error{color:#8f2d1c;font-weight:700;}html[dir="rtl"] .sheet-del{margin-left:0;margin-right:4px;}</style></head>
+<body>
+<a class="pm-skip" href="#contenu">Aller au contenu</a>
+<div id="pm-nav"></div>
+<main id="contenu" tabindex="-1">
+<div class="wrap wide" id="pm-list-view">
+<div class="hero">
+<p id="pm-back-link" style="display:none;text-align:left;"><a href="espace.html">Retour à tous les espaces</a></p>
+<span class="eyebrow" id="pm-list-eyebrow">Espace de travail</span>
+<h1 id="pm-list-title">Documents</h1>
+<p class="sub" id="pm-list-sub">Là où la collaboration avance vraiment : un texte rédigé à deux, un tableau de répartition des tâches, des diapositives pour la soutenance.</p>
+</div>
+<div id="pm-msg" class="msg-box" style="display:none;"></div>
+<div class="example">
+<div class="ex-tag">À quoi ça sert, concrètement</div>
+<div class="doc-grid" style="margin:10px 0 0;">
+<div class="doc-card"><div class="kind">Texte</div><div class="title">Le cadrage du projet</div><p>Exemple : « Contexte, objectifs, répartition, prochaines étapes ». Chaque nouveau texte démarre avec cette structure pré-remplie, à modifier ou effacer.</p></div>
+<div class="doc-card"><div class="kind">Feuille</div><div class="title">Qui fait quoi, pour quand</div><p>Exemple : une ligne par tâche, avec responsable, échéance et statut. Suffisant pour ne plus se demander qui attend quoi.</p></div>
+<div class="doc-card"><div class="kind">Diapositives</div><div class="title">La présentation à deux voix</div><p>Exemple : objectif du projet, ce que chacun apporte, prochaines étapes. Trois diapositives pré-remplies pour démarrer.</p></div>
+</div>
+<div class="ex-meta">L’assistant IA peut reformuler, résumer ou prolonger un texte. Rien n’est inséré sans relecture.</div>
+</div>
+<div id="pm-spaces-section">
+<h2 class="section-title">Espaces partagés</h2>
+<p class="field-hint">Un espace partagé apparaît automatiquement dès qu'une candidature est acceptée sur un projet : le porteur et les personnes acceptées y travaillent sur les mêmes documents, jusqu’à six en tout.</p>
+<div id="pm-spaces-grid" class="doc-grid"><p class="empty-note">Chargement…</p></div>
+</div>
+<div id="pm-team-chat" style="display:none;"></div>
+<div id="pm-personal-section">
+<h2 class="section-title" id="pm-docs-heading">Documents personnels</h2>
+<p class="field-hint" id="pm-docs-hint">Chaque nouveau document démarre avec un exemple, à modifier ou à effacer. Ces documents restent privés.</p>
+<div class="new-buttons" id="pm-new-buttons"><button class="btn accent" data-new="doc">Nouveau texte</button><button class="btn secondary" data-new="sheet">Nouvelle feuille</button><button class="btn secondary" data-new="slides">Nouvelles diapositives</button></div>
+<div id="pm-doc-grid" class="doc-grid"><p class="empty-note">Chargement…</p></div>
+</div>
+</div>
+<div class="wrap wide" id="pm-editor-view" style="display:none;">
+<p style="text-align:left;"><a href="espace.html" id="pm-back">Retour à mes documents</a></p>
+<span class="eyebrow left" id="pm-kind-label">Document</span>
+<input type="text" id="pm-doc-title" aria-label="Titre du document" style="font-family:'Fahkwang',sans-serif;font-size:26px;font-weight:600;color:#136577;border:none;border-radius:0;background:transparent;width:100%;margin:6px 0 10px;padding:0;" placeholder="Titre du document">
+<p class="field-hint" id="pm-doc-context" style="display:none;"></p>
+<p class="field-hint" id="pm-presence" style="display:none;"></p>
+<div class="new-buttons" id="pm-office-row" style="display:none;margin:4px 0 6px;"><button type="button" class="btn secondary small" id="pm-import">Importer</button><button type="button" class="btn secondary small" id="pm-export">Télécharger</button></div>
+<p class="field-hint" id="pm-office-hint" style="display:none;margin-top:0;"></p>
+<input type="file" id="pm-file" style="display:none;" aria-hidden="true">
+<div id="pm-doc-editor" style="display:none;">
+<div class="toolbar"><button type="button" data-cmd="bold"><b>G</b></button><button type="button" data-cmd="italic"><i>I</i></button><button type="button" data-cmd="underline"><u>S</u></button><button type="button" data-cmd="insertUnorderedList">Liste</button><button type="button" data-cmd="formatBlock" data-value="h2">Titre</button><button type="button" data-cmd="formatBlock" data-value="p">Paragraphe</button><button type="button" id="pm-ai-toggle" class="ai-btn">Assistant IA</button></div>
+<div class="editor-box" id="pm-rich-editor" contenteditable="true"></div>
+<div id="pm-ai-panel" class="ai-panel" style="display:none;">
+<p class="field-hint">L’assistant travaille sur la sélection s’il y en a une, sinon sur tout le document. Le résultat est à relire avant insertion.</p>
+<div class="new-buttons"><button type="button" class="btn secondary small" data-ai-action="reformulate">Reformuler</button><button type="button" class="btn secondary small" data-ai-action="summarize">Résumer</button><button type="button" class="btn secondary small" data-ai-action="continue">Continuer l'écriture</button></div>
+<div id="pm-ai-result" style="display:none;"><p class="field-hint" id="pm-ai-status"></p><div class="ai-result-box" id="pm-ai-text"></div><div class="new-buttons"><button type="button" class="btn accent small" id="pm-ai-insert">Insérer dans le document</button><button type="button" class="btn secondary small" id="pm-ai-discard">Ignorer</button></div></div>
+</div>
+</div>
+<div id="pm-sheet-editor" style="display:none;"><div class="sheet-actions"><button type="button" class="btn secondary small" id="pm-add-row">Ajouter une ligne</button><button type="button" class="btn secondary small" id="pm-add-col">Ajouter une colonne</button></div><div style="overflow-x:auto;"><table class="sheet" id="pm-sheet-table"></table></div><p class="field-hint">Une formule commence par = : =SOMME(A1:A5), =MOYENNE(B2:B9), =A1*B1+2. Fonctions disponibles : SOMME, MOYENNE, MIN, MAX, NB (les noms anglais marchent aussi). Les arguments se séparent par un point-virgule. La croix à côté d’un numéro ou d’une lettre supprime la ligne ou la colonne.</p></div>
+<div id="pm-slides-editor" style="display:none;"><div id="pm-slides-list"></div><button type="button" class="btn secondary" id="pm-add-slide">Ajouter une diapositive</button></div>
+<div class="form-actions" style="margin-top:22px;"><button type="button" class="btn accent" id="pm-save">Enregistrer</button><button type="button" class="btn secondary" id="pm-history">Historique</button><button type="button" class="btn secondary" id="pm-delete">Supprimer</button><span class="field-hint" id="pm-save-state" style="margin:0;"></span></div>
+<div id="pm-conflict" style="display:none;"></div>
+<div id="pm-history-panel" class="id-card" style="display:none;"></div>
+<div id="pm-editor-msg" class="msg-box" style="display:none;"></div>
+</div>
+</main>
+<div id="pm-footer"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js" integrity="sha384-+VfUPEb0PdtChMwmBcBmykRMDd+v6D/oFmB3rZM/puCMDYcIvF968OimRh4KQY9a" crossorigin="anonymous"></script>
+<script src="outils/supabase-js-2.117.1.js"></script>
+<script src="app.js"></script>
+<script src="outils/espace-outils.js"></script>
+<script>
+const PM_ALLOWED_TAGS=["h1","h2","h3","h4","p","br","hr","strong","b","em","i","u","s","ul","ol","li","blockquote","code","pre","span","div","a","table","thead","tbody","tr","th","td"];
+function pmCleanHtml(html){if(typeof DOMPurify==="undefined"||!DOMPurify.sanitize)return null;return DOMPurify.sanitize(String(html||""),{ALLOWED_TAGS:PM_ALLOWED_TAGS,ALLOWED_ATTR:["href","title"],ALLOW_DATA_ATTR:false,FORBID_TAGS:["script","style","iframe","object","embed","form","input","button","svg","math"],FORBID_ATTR:["style"]});}
+function pmSecurityReady(){return typeof DOMPurify!=="undefined"&&!!DOMPurify.sanitize;}
+const kindLabels={doc:"Texte",sheet:"Feuille",slides:"Diapositives"};let session=null;let currentDoc=null;let sheetData=null;
+let docVersion=null;let docDirty=false;let autosaveTimer=null;let conflictOpen=false;let presenceChannel=null;let myName=null;
+function qp(){return new URLSearchParams(window.location.search);}
+function showListView(){document.getElementById("pm-list-view").style.display="block";document.getElementById("pm-editor-view").style.display="none";}
+function showEditorView(){document.getElementById("pm-list-view").style.display="none";document.getElementById("pm-editor-view").style.display="block";}
+function defaultContent(kind){if(kind==="sheet"){const rows=Array.from({length:8},()=>Array(4).fill(""));rows[0]=["Tâche","Responsable","Échéance","Statut"];rows[1]=["Exemple : cadrer le sujet ensemble","Toi","dans 1 semaine","en cours"];return{rows};}if(kind==="slides"){return{slides:[{title:"Objectif du projet",body:"Exemple : en une phrase, le problème qu'on essaie de résoudre ensemble."},{title:"Ce que chacun apporte",body:"Exemple : compétences, données ou ressources de chaque partenaire."},{title:"Prochaines étapes",body:"Exemple : les 2 ou 3 actions concrètes à faire avant le prochain point."}]};}return{html:"<h2>Contexte</h2><p>Remplace ce texte : décris le point de départ en quelques phrases.</p><h2>Objectifs</h2><p>Exemple : ce que vous voulez accomplir ensemble, et comment vous saurez que c'est atteint.</p><h2>Répartition</h2><p>Exemple : qui s'occupe de quoi, avec quelles compétences.</p><h2>Prochaines étapes</h2><p>Exemple : les actions à venir, avec qui et pour quand.</p>"};}
+async function loadSpaces(){const uid=session.user.id;const spacesEl=document.getElementById("pm-spaces-grid");const[ownedRes,joinedRes]=await Promise.all([client.from("projects").select("id,title,applications!inner(status,profiles(full_name))").eq("owner_id",uid).eq("applications.status","accepted"),client.from("applications").select("project_id,projects(id,title,owner_id,profiles(full_name))").eq("applicant_id",uid).eq("status","accepted")]);const map=new Map();if(!ownedRes.error&&ownedRes.data){ownedRes.data.forEach((p)=>{const partners=(p.applications||[]).map((a)=>a.profiles&&a.profiles.full_name).filter(Boolean);map.set(p.id,{id:p.id,title:p.title,partners});});}if(!joinedRes.error&&joinedRes.data){joinedRes.data.forEach((a)=>{if(!a.projects)return;const ownerName=a.projects.profiles&&a.projects.profiles.full_name;const existing=map.get(a.projects.id);if(existing){if(ownerName&&!existing.partners.includes(ownerName))existing.partners.push(ownerName);}else{map.set(a.projects.id,{id:a.projects.id,title:a.projects.title,partners:ownerName?[ownerName]:[]});}});}const spaces=Array.from(map.values());if(spaces.length===0){spacesEl.innerHTML='<p class="empty-note">Aucun espace partagé pour l’instant. Il s’ouvre tout seul dès qu’une candidature est acceptée, dans un sens ou dans l’autre.</p>';return;}spacesEl.innerHTML=spaces.map((s)=>'<a class="doc-card" href="espace.html?project='+s.id+'"><div class="kind">Espace partagé</div><div class="title">'+pmEscape(s.title)+"</div>"+'<div class="meta">'+(s.partners.length?pmT("Avec")+" "+s.partners.map(pmEscape).join(", "):"En attente de partenaire")+"</div></a>").join("");}
+async function loadDocs(projectId){const gridEl=document.getElementById("pm-doc-grid");let query=client.from("documents").select("id,title,kind,updated_at,owner_id,profiles!documents_owner_id_fkey(full_name)").order("updated_at",{ascending:false});query=projectId?query.eq("project_id",projectId):query.is("project_id",null);const{data,error}=await query;if(error){gridEl.innerHTML='<p class="empty-note">Erreur : '+pmEscape(error.message)+"</p>";return;}if(!data||data.length===0){gridEl.innerHTML='<p class="empty-note">Aucun document pour l’instant. Crée-en un ci-dessus : il arrive pré-rempli avec un exemple de structure.</p>';return;}const uid=session.user.id;gridEl.innerHTML=data.map((d)=>{const authorNote=projectId&&d.owner_id!==uid&&d.profiles?'<div class="meta">Par '+pmEscape(d.profiles.full_name)+"</div>":"";return('<a class="doc-card" href="espace.html?doc='+d.id+'"><div class="kind">'+kindLabels[d.kind]+"</div>"+'<div class="title">'+pmEscape(d.title)+"</div>"+authorNote+'<div class="meta">Modifié le '+pmFormatDate(d.updated_at)+"</div></a>");}).join("");}
+async function renderHomeSpace(){document.getElementById("pm-team-chat").style.display="none";document.getElementById("pm-spaces-section").style.display="block";document.getElementById("pm-back-link").style.display="none";document.getElementById("pm-list-eyebrow").textContent="Espace de travail";document.getElementById("pm-list-title").textContent=pmT("Documents");document.getElementById("pm-new-buttons").style.display="flex";await Promise.all([loadSpaces(),loadDocs(null)]);}
+async function renderProjectSpace(projectId){document.getElementById("pm-spaces-section").style.display="none";document.getElementById("pm-back-link").style.display="block";document.getElementById("pm-docs-heading").textContent="Documents de cet espace";document.getElementById("pm-docs-hint").textContent="Ces documents sont visibles et modifiables par le porteur du projet et par toutes les personnes dont la candidature a été acceptée.";document.getElementById("pm-new-buttons").style.display="flex";const{data:project,error}=await client.from("projects").select("id,title,owner_id,profiles(full_name),applications(status,applicant_id,profiles(full_name))").eq("id",projectId).maybeSingle();if(error||!project){document.getElementById("pm-list-eyebrow").textContent="Espace partagé";document.getElementById("pm-list-title").textContent="Espace introuvable";document.getElementById("pm-list-sub").textContent="Ce projet n'existe pas ou plus.";document.getElementById("pm-new-buttons").style.display="none";document.getElementById("pm-doc-grid").innerHTML="";return;}const uid=session.user.id;const isOwner=project.owner_id===uid;const accepted=(project.applications||[]).filter((a)=>a.status==="accepted");const isPartner=accepted.some((a)=>a.applicant_id===uid);if(!isOwner&&!isPartner){document.getElementById("pm-list-eyebrow").textContent="Espace partagé";document.getElementById("pm-list-title").textContent="Accès non autorisé";document.getElementById("pm-list-sub").textContent="Cet espace est réservé au porteur du projet et aux personnes dont la candidature a été acceptée.";document.getElementById("pm-new-buttons").style.display="none";document.getElementById("pm-doc-grid").innerHTML="";return;}const names=[];if(!isOwner&&project.profiles&&project.profiles.full_name)names.push(project.profiles.full_name);accepted.forEach((a)=>{if(a.applicant_id!==uid&&a.profiles&&a.profiles.full_name)names.push(a.profiles.full_name);});document.getElementById("pm-list-eyebrow").textContent="Espace partagé";document.getElementById("pm-list-title").textContent=project.title;document.getElementById("pm-list-sub").textContent=names.length>0?pmT("Espace de travail partagé avec {noms}.").replace("{noms}",names.join(", ")):pmT("Espace de travail lié à ce projet.");await loadDocs(projectId);await renderTeamChat(projectId);}
+let teamChatChannel=null;
+async function loadTeamMessages(projectId){const r=await client.from("project_messages").select("id,sender_id,content,created_at,profiles(full_name)").eq("project_id",projectId).order("created_at",{ascending:true});return r.error?null:(r.data||[]);}
+async function renderTeamChat(projectId){
+const host=document.getElementById("pm-team-chat");
+host.style.display="block";
+const rows=await loadTeamMessages(projectId);
+const uid=session.user.id;
+let thread="";
+if(rows===null){thread='<p class="empty-note">La discussion d’équipe n’a pas pu être chargée. Recharge la page.</p>';}
+else if(rows.length===0){thread='<p class="empty-note">Aucun message pour l’instant. C’est ici qu’on se met d’accord : qui fait quoi, ce qui bloque, la prochaine échéance. Les échanges privés, eux, restent dans la messagerie.</p>';}
+else{thread='<div class="msg-scroll" id="pm-team-scroll">'+rows.map(function(m){const mine=m.sender_id===uid;const n=(m.profiles&&m.profiles.full_name)||"Membre";return '<div class="thread-msg'+(mine?" mine":"")+'"><p>'+pmEscape(m.content)+'</p><div class="meta">'+(mine?pmV("Toi","Vous"):pmEscape(n))+' · <span class="when">'+pmRelativeTime(m.created_at)+"</span></div></div>";}).join("")+"</div>";}
+host.innerHTML='<h2 class="section-title">Discussion d’équipe</h2><p class="field-hint">Ce fil est visible par toutes les personnes de l’équipe, et par elles seules. Ce qui s’y écrit compte comme échange pour l’attestation.</p>'+thread+'<form class="card" id="pm-team-form"><label for="pm-team-content">Écrire à l’équipe</label><textarea id="pm-team-content" required placeholder="Une décision à acter, un point de blocage, une échéance."></textarea><div class="form-actions"><button type="submit" class="btn accent">Envoyer à l’équipe</button><span class="field-hint" style="margin:0;"><span class="live-dot"></span>Les réponses apparaissent ici en direct.</span></div></form>';
+const sc=document.getElementById("pm-team-scroll");if(sc)sc.scrollTop=sc.scrollHeight;
+document.getElementById("pm-team-form").addEventListener("submit",async function(e){e.preventDefault();const ta=document.getElementById("pm-team-content");const content=ta.value.trim();if(!content)return;const btn=e.target.querySelector("button");btn.disabled=true;const r=await client.from("project_messages").insert({project_id:projectId,sender_id:uid,content:content});btn.disabled=false;if(r.error){alert(r.error.message);return;}ta.value="";await renderTeamChat(projectId);});
+if(!teamChatChannel){teamChatChannel=client.channel("pm-team-"+projectId).on("postgres_changes",{event:"INSERT",schema:"public",table:"project_messages",filter:"project_id=eq."+projectId},function(){renderTeamChat(projectId);}).subscribe();}
+}
+async function createDoc(kind,projectId){const payload={owner_id:session.user.id,kind:kind,title:"Sans titre",content:defaultContent(kind)};if(projectId)payload.project_id=projectId;const{data,error}=await client.from("documents").insert(payload).select().single();if(error){pmShowMessage(document.getElementById("pm-msg"),error.message,"error");return;}window.location.href="espace.html?doc="+data.id;}
+async function loadDoc(id){const{data,error}=await client.from("documents").select("*,profiles!documents_owner_id_fkey(full_name),projects(id,title)").eq("id",id).maybeSingle();if(error||!data){showListView();pmShowMessage(document.getElementById("pm-msg"),"Document introuvable.","error");await renderHomeSpace();return;}openEditor(data);}
+function renderSheet(){
+var table=document.getElementById("pm-sheet-table");
+var cols=1;sheetData.forEach(function(r){if(r.length>cols)cols=r.length;});
+sheetData.forEach(function(r){while(r.length<cols)r.push("");});
+var head='<thead><tr><th class="sh-corner"></th>';
+for(var c=0;c<cols;c++){var cn=pmColName(c);head+="<th>"+cn+(cols>1?'<button type="button" class="sheet-del" data-del-col="'+c+'" title="'+pmEscape(pmT("Supprimer la colonne {c}").replace("{c}",cn))+'" aria-label="'+pmEscape(pmT("Supprimer la colonne {c}").replace("{c}",cn))+'">×</button>':"")+"</th>";}
+head+="</tr></thead>";
+var body="<tbody>"+sheetData.map(function(row,r){return "<tr><th>"+(r+1)+(sheetData.length>1?'<button type="button" class="sheet-del" data-del-row="'+r+'" title="'+pmEscape(pmT("Supprimer la ligne {n}").replace("{n}",r+1))+'" aria-label="'+pmEscape(pmT("Supprimer la ligne {n}").replace("{n}",r+1))+'">×</button>':"")+"</th>"+row.map(function(cell,c){return '<td><input type="text" data-r="'+r+'" data-c="'+c+'" aria-label="'+pmEscape(pmT("Ligne {n}, colonne {c}").replace("{n}",r+1).replace("{c}",pmColName(c)))+'"></td>';}).join("")+"</tr>";}).join("")+"</tbody>";
+table.innerHTML=head+body;
+table.querySelectorAll("input").forEach(function(inp){
+var r=parseInt(inp.getAttribute("data-r"),10),c=parseInt(inp.getAttribute("data-c"),10);
+inp.addEventListener("focus",function(){inp.value=String(sheetData[r][c]==null?"":sheetData[r][c]);inp.classList.remove("is-formula","is-error","is-num");});
+inp.addEventListener("input",function(){sheetData[r][c]=inp.value;pmQueueRefresh();});
+inp.addEventListener("blur",function(){pmRefreshSheet();});});
+table.querySelectorAll("[data-del-row]").forEach(function(b){b.addEventListener("click",function(){pmDeleteLine("r",parseInt(b.getAttribute("data-del-row"),10));});});
+table.querySelectorAll("[data-del-col]").forEach(function(b){b.addEventListener("click",function(){pmDeleteLine("c",parseInt(b.getAttribute("data-del-col"),10));});});
+pmRefreshSheet();}
+var pmRefreshTimer=null;
+function pmQueueRefresh(){clearTimeout(pmRefreshTimer);pmRefreshTimer=setTimeout(pmRefreshSheet,150);}
+function pmRefreshSheet(){
+var ev=pmSheetEval(sheetData);var active=document.activeElement;
+document.querySelectorAll("#pm-sheet-table input").forEach(function(inp){
+if(inp===active)return;
+var r=parseInt(inp.getAttribute("data-r"),10),c=parseInt(inp.getAttribute("data-c"),10);
+var raw=String(sheetData[r]&&sheetData[r][c]!=null?sheetData[r][c]:"");
+inp.classList.remove("is-formula","is-error","is-num");
+if(raw.charAt(0)==="="){var res=ev(r,c);inp.title=raw;if(res.err){inp.value=res.err;inp.classList.add("is-error");}else{inp.value=pmFmt(res.v);inp.classList.add("is-formula","is-num");}}
+else{inp.value=raw;inp.removeAttribute("title");if(pmParseNum(raw)!==null)inp.classList.add("is-num");}});}
+function pmDeleteLine(axis,idx){
+var filled=axis==="r"?sheetData[idx].some(function(v){return String(v==null?"":v).trim()!=="";}):sheetData.some(function(row){return String(row[idx]==null?"":row[idx]).trim()!=="";});
+if(filled&&!confirm(axis==="r"?pmT("Supprimer la ligne {n} et son contenu ?").replace("{n}",idx+1):pmT("Supprimer la colonne {c} et son contenu ?").replace("{c}",pmColName(idx))))return;
+if(axis==="r")sheetData.splice(idx,1);else sheetData.forEach(function(row){row.splice(idx,1);});
+sheetData.forEach(function(row,r){row.forEach(function(v,c){var s=String(v==null?"":v);if(s.charAt(0)==="=")row[c]=pmShiftRefs(s,axis,idx);});});
+renderSheet();markDirty();}
+function renderSlides(slides){const listEl=document.getElementById("pm-slides-list");listEl.innerHTML=slides.map((s,i)=>'<div class="slide-card" data-index="'+i+'"><div class="slide-num">'+pmT("Diapositive {n}").replace("{n}",i+1)+"</div>"+'<input type="text" class="pm-slide-title" value="'+pmEscape(s.title)+'" placeholder="Titre de la diapositive" aria-label="'+pmEscape(pmT("Titre de la diapositive"))+'"><textarea class="pm-slide-body" placeholder="Contenu, une idée par ligne" aria-label="'+pmEscape(pmT("Contenu de la diapositive"))+'">'+pmEscape(s.body)+"</textarea>"+(slides.length>1?'<button type="button" class="btn secondary small pm-remove-slide">Retirer cette diapositive</button>':"")+"</div>").join("");listEl.querySelectorAll(".pm-remove-slide").forEach((btn)=>{btn.addEventListener("click",()=>{const idx=parseInt(btn.closest(".slide-card").getAttribute("data-index"),10);const slides=collectSlides();slides.splice(idx,1);renderSlides(slides);});});}
+function collectSlides(){return Array.from(document.querySelectorAll("#pm-slides-list .slide-card")).map((card)=>({title:card.querySelector(".pm-slide-title").value,body:card.querySelector(".pm-slide-body").value}));}
+function openEditor(doc){currentDoc=doc;showEditorView();const isShared=!!doc.project_id;document.getElementById("pm-kind-label").textContent=isShared?"Document partagé":kindLabels[doc.kind];const backLink=document.getElementById("pm-back");if(isShared){backLink.setAttribute("href","espace.html?project="+doc.project_id);backLink.textContent="Retour à l'espace partagé";}else{backLink.setAttribute("href","espace.html");backLink.textContent="Retour à mes documents";}const contextEl=document.getElementById("pm-doc-context");if(isShared){const uid=session.user.id;const projectTitle=doc.projects?doc.projects.title:"";const authorName=doc.profiles?doc.profiles.full_name:"";contextEl.textContent=pmT("Espace partagé")+(projectTitle?" · "+projectTitle:"")+(authorName&&doc.owner_id!==uid?" · "+pmT("créé par {who}").replace("{who}",authorName):"");contextEl.style.display="block";}else{contextEl.style.display="none";}document.getElementById("pm-doc-title").value=doc.title;document.getElementById("pm-doc-editor").style.display=doc.kind==="doc"?"block":"none";document.getElementById("pm-sheet-editor").style.display=doc.kind==="sheet"?"block":"none";document.getElementById("pm-slides-editor").style.display=doc.kind==="slides"?"block":"none";if(doc.kind==="doc"){var rawHtml=(doc.content&&doc.content.html)||"";var safeHtml=pmCleanHtml(rawHtml);var ed=document.getElementById("pm-rich-editor");if(safeHtml===null){ed.textContent=rawHtml;pmShowMessage(document.getElementById("pm-editor-msg"),"Le filtre de sécurité n’a pas pu être chargé. Le document est affiché en texte brut et ne peut pas être enregistré. Recharge la page.","error");}else{ed.innerHTML=safeHtml;}}else if(doc.kind==="sheet"){sheetData=(doc.content&&doc.content.rows)||defaultContent("sheet").rows;renderSheet();}else if(doc.kind==="slides"){renderSlides((doc.content&&doc.content.slides)||defaultContent("slides").slides);}document.getElementById("pm-delete").style.display=doc.owner_id===session.user.id?"inline-block":"none";
+docVersion=doc.updated_at;docDirty=false;conflictOpen=false;
+document.getElementById("pm-conflict").style.display="none";
+document.getElementById("pm-history-panel").style.display="none";
+setSaveState("");startAutosave();startPresence(doc.id);setupOffice(doc.kind);}
+function gatherContent(){if(currentDoc.kind==="doc"){var c=pmCleanHtml(document.getElementById("pm-rich-editor").innerHTML);if(c===null)return null;return{html:c};}if(currentDoc.kind==="sheet"){return{rows:sheetData};}if(currentDoc.kind==="slides"){return{slides:collectSlides()};}return{};}
+document.querySelectorAll("[data-new]").forEach((btn)=>{btn.addEventListener("click",()=>createDoc(btn.getAttribute("data-new"),qp().get("project")));});
+document.querySelectorAll(".toolbar [data-cmd]").forEach((btn)=>{btn.addEventListener("click",()=>{document.getElementById("pm-rich-editor").focus();document.execCommand(btn.getAttribute("data-cmd"),false,btn.getAttribute("data-value")||undefined);});});
+let aiLastRange=null;let aiLastAction=null;
+function getEditorSelectionText(){const editor=document.getElementById("pm-rich-editor");const sel=window.getSelection();if(sel&&sel.rangeCount>0&&!sel.isCollapsed){const range=sel.getRangeAt(0);if(editor.contains(range.commonAncestorContainer)){aiLastRange=range.cloneRange();return sel.toString();}}aiLastRange=null;return editor.innerText;}
+const aiToggle=document.getElementById("pm-ai-toggle");
+if(aiToggle){aiToggle.addEventListener("click",()=>{const panel=document.getElementById("pm-ai-panel");panel.style.display=panel.style.display==="none"?"block":"none";});document.querySelectorAll("[data-ai-action]").forEach((btn)=>{btn.addEventListener("mousedown",(e)=>e.preventDefault());btn.addEventListener("click",async()=>{const action=btn.getAttribute("data-ai-action");const text=getEditorSelectionText();if(!text||!text.trim()){alert(pmT("Le document est vide, écris d'abord un peu de texte."));return;}aiLastAction=action;const resultZone=document.getElementById("pm-ai-result");const statusEl=document.getElementById("pm-ai-status");const textEl=document.getElementById("pm-ai-text");resultZone.style.display="block";statusEl.textContent="L'assistant réfléchit...";textEl.textContent="";document.querySelectorAll("[data-ai-action]").forEach((b)=>(b.disabled=true));try{const result=await pmAiAssist(action,text);textEl.textContent=result;statusEl.textContent="Résultat de l'assistant, à relire avant d'insérer :";}catch(e){statusEl.textContent="";textEl.textContent=e.message;}finally{document.querySelectorAll("[data-ai-action]").forEach((b)=>(b.disabled=false));}});});document.getElementById("pm-ai-insert").addEventListener("click",()=>{const editor=document.getElementById("pm-rich-editor");const newText=document.getElementById("pm-ai-text").textContent;if(!newText)return;if(aiLastAction==="continue"){editor.innerHTML+="<p>"+pmEscape(newText).replace(/\n/g,"<br>")+"</p>";}else if(aiLastRange){aiLastRange.deleteContents();aiLastRange.insertNode(document.createTextNode(newText));aiLastRange=null;}else{editor.innerHTML="<p>"+pmEscape(newText).replace(/\n/g,"<br>")+"</p>";}document.getElementById("pm-ai-result").style.display="none";document.getElementById("pm-ai-panel").style.display="none";});document.getElementById("pm-ai-discard").addEventListener("click",()=>{document.getElementById("pm-ai-result").style.display="none";});}
+document.getElementById("pm-add-row").addEventListener("click",()=>{sheetData.push(Array(sheetData[0]?sheetData[0].length:4).fill(""));renderSheet();markDirty();});
+document.getElementById("pm-add-col").addEventListener("click",()=>{sheetData.forEach((row)=>row.push(""));renderSheet();markDirty();});
+document.getElementById("pm-add-slide").addEventListener("click",()=>{const slides=collectSlides();slides.push({title:"Diapositive "+(slides.length+1),body:""});renderSlides(slides);});
+function setSaveState(t){var el=document.getElementById("pm-save-state");if(el)el.textContent=t||"";}
+function markDirty(e){if(e&&e.target&&e.target.id==="pm-file")return;docDirty=true;setSaveState(pmT("Modifications non enregistrées"));}
+function stopAutosave(){if(autosaveTimer){clearInterval(autosaveTimer);autosaveTimer=null;}}
+function startAutosave(){stopAutosave();autosaveTimer=setInterval(function(){if(docDirty&&!conflictOpen)saveDoc(false,true);},20000);}
+async function saveDoc(force,silent){
+const msgEl=document.getElementById("pm-editor-msg");
+if(!currentDoc)return false;
+const title=document.getElementById("pm-doc-title").value.trim()||"Sans titre";
+const content=gatherContent();
+if(content===null){pmShowMessage(msgEl,pmT("Enregistrement bloqué : le filtre de sécurité n’est pas chargé. Recharger la page avant de continuer, le texte reste à l’écran."),"error");return false;}
+setSaveState(pmT("Enregistrement…"));
+const r=await client.rpc("save_document",{p_document_id:currentDoc.id,p_title:title,p_content:content,p_expected_updated_at:force?null:docVersion});
+if(r.error){pmShowMessage(msgEl,r.error.message,"error");setSaveState("");return false;}
+const d=r.data||{};
+if(d.conflict){showConflict(d);return false;}
+docVersion=d.updated_at;docDirty=false;conflictOpen=false;
+currentDoc.title=title;currentDoc.content=content;
+document.getElementById("pm-conflict").style.display="none";
+if(!silent)pmShowMessage(msgEl,pmT("Document enregistré."),"ok");
+setSaveState(pmT("Enregistré à l’instant"));
+return true;}
+function showConflict(d){
+conflictOpen=true;
+var who=d.editor_name?pmEscape(d.editor_name):pmT("Quelqu’un de l’équipe");
+var box=document.getElementById("pm-conflict");
+box.className="sec-warn";box.style.display="block";
+box.innerHTML='<p style="margin:0 0 10px;">'+pmT("{who} a enregistré ce document depuis que tu l’as ouvert. Pour ne rien écraser, ton texte n’a pas été enregistré.").replace("{who}",who)+"</p>"+'<div class="new-buttons" style="margin:0;"><button type="button" class="btn secondary small" id="pm-conflict-reload">'+pmT("Recharger la version enregistrée")+'</button><button type="button" class="btn secondary small" id="pm-conflict-force">'+pmT("Garder mon texte et écraser")+"</button></div>";
+document.getElementById("pm-conflict-reload").addEventListener("click",function(){docDirty=false;stopAutosave();window.location.href="espace.html?doc="+currentDoc.id;});
+document.getElementById("pm-conflict-force").addEventListener("click",async function(){if(await saveDoc(true,false))box.style.display="none";});
+setSaveState(pmT("Conflit à résoudre"));}
+function renderPresence(){
+if(!presenceChannel)return;
+var others=[];
+try{var st=presenceChannel.presenceState();Object.keys(st).forEach(function(k){(st[k]||[]).forEach(function(m){if(m&&m.uid!==session.user.id&&others.indexOf(m.name)===-1)others.push(m.name);});});}catch(e){return;}
+var el=document.getElementById("pm-presence");if(!el)return;
+if(others.length===0){el.style.display="none";el.innerHTML="";return;}
+el.style.display="block";
+el.innerHTML='<span class="live-dot"></span>'+pmEscape(pmT("Aussi sur ce document : {qui}").replace("{qui}",others.join(", ")));}
+function startPresence(docId){
+if(presenceChannel){try{client.removeChannel(presenceChannel);}catch(e){}presenceChannel=null;}
+var el=document.getElementById("pm-presence");if(el){el.style.display="none";el.innerHTML="";}
+if(!currentDoc||!currentDoc.project_id)return;
+presenceChannel=client.channel("pm-doc-"+docId);
+presenceChannel.on("presence",{event:"sync"},renderPresence).on("presence",{event:"join"},renderPresence).on("presence",{event:"leave"},renderPresence).subscribe(function(status){if(status==="SUBSCRIBED"){presenceChannel.track({uid:session.user.id,name:myName||pmT("Un membre")});}});}
+document.getElementById("pm-save").addEventListener("click",function(){saveDoc(false,false);});
+document.getElementById("pm-editor-view").addEventListener("input",markDirty);
+window.addEventListener("beforeunload",function(e){if(docDirty){e.preventDefault();e.returnValue="";}});
+document.getElementById("pm-history").addEventListener("click",async function(){
+var panel=document.getElementById("pm-history-panel");
+if(panel.style.display==="block"){panel.style.display="none";return;}
+panel.style.display="block";panel.innerHTML='<p class="empty-note">Chargement…</p>';
+var r=await client.rpc("document_history",{p_document_id:currentDoc.id});
+if(r.error){panel.innerHTML='<p class="empty-note">'+pmEscape(r.error.message)+"</p>";return;}
+var rows=r.data||[];
+var head='<p class="ex-label" style="margin-top:0;">Historique</p>';
+if(rows.length===0){panel.innerHTML=head+'<p class="empty-note">Aucune version enregistrée pour l’instant. Chaque enregistrement en crée une.</p>';return;}
+panel.innerHTML=head+'<p class="field-hint">Les vingt derniers enregistrements. Restaurer une version n’efface rien : elle devient la version courante.</p>'+rows.map(function(v,i){return '<div class="c-line"><span class="c-who">'+pmEscape(v.title||"Sans titre")+' <span class="meta" style="font-weight:400;">'+pmEscape(v.author_name||"Un membre")+" · "+pmRelativeTime(v.saved_at)+"</span></span>"+(i===0?'<span class="att-state issued">'+pmT("version courante")+"</span>":'<button type="button" class="btn secondary small" data-restore="'+v.version_id+'">'+pmT("Restaurer")+"</button>")+"</div>";}).join("");
+panel.querySelectorAll("[data-restore]").forEach(function(b){b.addEventListener("click",async function(){b.disabled=true;var rr=await client.rpc("restore_document_version",{p_version_id:b.getAttribute("data-restore")});if(rr.error){alert(rr.error.message);b.disabled=false;return;}docDirty=false;stopAutosave();window.location.href="espace.html?doc="+currentDoc.id;});});});
+document.getElementById("pm-delete").addEventListener("click",async()=>{if(!confirm("Supprimer définitivement ce document ?"))return;const{error}=await client.from("documents").delete().eq("id",currentDoc.id);if(error){pmShowMessage(document.getElementById("pm-editor-msg"),error.message,"error");return;}window.location.href=currentDoc.project_id?"espace.html?project="+currentDoc.project_id:"espace.html";});
+(async()=>{session=await pmInitNav("espace.html");if(!session){window.location.href="connexion.html?next=espace.html";return;}
+myName=PM_ME&&PM_ME.full_name;const docId=qp().get("doc");if(docId){await loadDoc(docId);return;}showListView();const projectId=qp().get("project");if(projectId){await renderProjectSpace(projectId);}else{await renderHomeSpace();}})();
+</script>
+</body>
+</html>

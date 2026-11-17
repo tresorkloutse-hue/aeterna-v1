@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Mon profil : Polymatch</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#136577">
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<a class="pm-skip" href="#contenu">Aller au contenu</a>
+<div id="pm-nav"></div>
+<main id="contenu" tabindex="-1">
+<div class="wrap hero">
+<span class="eyebrow">Identité</span>
+<h1 id="pm-page-title">Mon profil</h1>
+<p class="sub" id="pm-public-line" style="display:none;"></p>
+<p class="sub" id="pm-page-sub">C'est ta carte de visite ici : ta discipline, ce que tu sais faire, ce que tu cherches. Sois précis, c'est exactement ce qui te rendra trouvable par quelqu'un d'une autre filière.</p>
+</div>
+<div class="wrap">
+<div class="id-card">
+<label for="pm-account-type">Ce compte appartient à</label>
+<select id="pm-account-type">
+<option value="personne">Une personne : étudiant, doctorant, chercheur</option>
+<option value="institution">Une institution : université, laboratoire, association, entreprise</option>
+</select>
+<p class="field-hint" id="pm-type-hint">Une personne cherche un binôme pour avancer sur son propre travail. Une institution publie des appels : stages, thèses, missions. Le formulaire et les pages du site s'adaptent à ce choix.</p>
+</div>
+
+<div class="example" id="pm-example-person">
+<div class="ex-stamp">Exemple<br>fictif</div>
+<div class="ex-tag">Exemple de profil rempli, champ par champ</div>
+<div class="ex-label">Discipline</div>
+<p class="ex-field">Écologie (Master 2)</p>
+<div class="ex-label">Présentation</div>
+<p class="ex-field">Master 2 en écologie, à l'aise avec le travail de terrain et la collecte de données de biodiversité, beaucoup moins avec les statistiques avancées. Je cherche quelqu'un capable de m'aider à analyser trois ans de relevés.</p>
+<div class="ex-label">Compétences</div>
+<p class="ex-field">terrain, identification d'espèces, QGIS, rédaction scientifique</p>
+<div class="ex-label">Disponibilité</div>
+<p class="ex-field">quelques heures par semaine, jusqu'en juin</p>
+<div class="ex-note">« beaucoup moins avec les statistiques avancées » : c’est cette phrase qui fait qu’on lui écrit.</div>
+</div>
+
+<div class="inst-block" id="pm-example-org" style="display:none;">
+<div class="ex-stamp low">Exemple<br>fictif</div>
+<div class="ex-tag">Exemple de fiche institution remplie</div>
+<div class="ex-label">Nom de la structure</div>
+<p class="ex-field">Laboratoire d'écologie des sols, Université de Lorraine</p>
+<div class="ex-label">Type de structure</div>
+<p class="ex-field">Laboratoire</p>
+<div class="ex-label">Domaines de travail</div>
+<p class="ex-field">Écologie du sol, biostatistiques, télédétection</p>
+<div class="ex-label">Présentation</div>
+<p class="ex-field">Unité de recherche de 22 personnes, spécialisée sur la biodiversité des sols agricoles. Nous accueillons chaque année des stagiaires de Master et des doctorants, et nous cherchons régulièrement des profils quantitatifs venus d'autres disciplines pour traiter nos jeux de données de terrain.</p>
+<div class="ex-label">Personne de contact</div>
+<p class="ex-field">Camille Diallo, responsable des stages</p>
+<div class="ex-note">Dire « 22 personnes » et « 4 stagiaires par an » rassure bien plus que « laboratoire reconnu ».</div>
+<div class="ex-meta">Exemple fictif. Une institution est signalée par un badge sur toutes ses publications, et ses appels apparaissent dans un onglet distinct de la page Projets.</div>
+</div>
+
+<div id="pm-msg" class="msg-box" style="display:none;"></div>
+<div class="id-card">
+<form id="pm-form">
+<label for="pm-name" id="pm-label-name">Nom complet</label><input type="text" id="pm-name" required placeholder="Camille Diallo">
+<div id="pm-org-fields" style="display:none;">
+<label for="pm-org-kind">Type de structure</label>
+<select id="pm-org-kind">
+<option value="">À préciser</option>
+<option value="universite">Université</option>
+<option value="laboratoire">Laboratoire</option>
+<option value="ecole">École</option>
+<option value="association">Association</option>
+<option value="entreprise">Entreprise</option>
+<option value="collectivite">Collectivité</option>
+<option value="autre">Autre structure</option>
+</select>
+<label for="pm-contact-name">Personne de contact</label><input type="text" id="pm-contact-name" placeholder="Camille Diallo, responsable des stages">
+<p class="field-hint">Affichée sur votre fiche pour que les candidats sachent à qui ils écrivent.</p>
+<label for="pm-country">Pays</label><input type="text" id="pm-country" placeholder="France">
+<label for="pm-website">Site web</label><input type="text" id="pm-website" placeholder="https://labo.universite.fr">
+</div>
+<label for="pm-discipline" id="pm-label-discipline">Discipline ou domaine</label><input type="text" id="pm-discipline" placeholder="Écologie, Statistiques, Design, Droit...">
+<div id="pm-university-field">
+<label for="pm-university">Établissement</label><input type="text" id="pm-university" placeholder="Sorbonne Université">
+</div>
+<label for="pm-bio" id="pm-label-bio">Présentation</label><textarea id="pm-bio" placeholder="Ce que tu étudies, ce que tu sais faire, et surtout ce qui te manque pour avancer."></textarea>
+<p class="field-hint" id="pm-hint-bio">Deux à trois phrases suffisent. Le plus utile : dire clairement ce qui te bloque.</p>
+<label for="pm-skills" id="pm-label-skills">Compétences (séparées par des virgules)</label><input type="text" id="pm-skills" placeholder="R, statistiques bayésiennes, terrain, cartographie">
+<div id="pm-availability-field">
+<label for="pm-availability">Disponibilité</label><input type="text" id="pm-availability" placeholder="quelques heures par semaine, jusqu'en juin">
+</div>
+<div class="form-actions"><button type="submit" class="btn accent" id="pm-submit">Enregistrer mon profil</button></div>
+</form>
+</div>
+<div class="compare" id="pm-compare-person">
+<div class="compare-col bad"><div class="c-head">À éviter</div><p>« Étudiant motivé, ouvert à tout projet intéressant. » Personne ne peut savoir ce que tu sais faire ni ce dont tu as besoin.</p></div>
+<div class="compare-col good"><div class="c-head">Bien plus efficace</div><p>« J'ai des données, je sais faire X, il me manque Y. » Nomme ce qui te bloque : c'est ce qui donne envie à quelqu'un d'autre de te répondre.</p></div>
+</div>
+<div class="compare" id="pm-compare-org" style="display:none;">
+<div class="compare-col bad"><div class="c-head">À éviter</div><p>« Laboratoire de recherche reconnu, nombreux projets en cours. » Un étudiant ne saura pas s'il a sa place chez vous.</p></div>
+<div class="compare-col good"><div class="c-head">Bien plus efficace</div><p>« 22 personnes, on travaille sur les sols agricoles, on accueille 4 stagiaires par an et il nous manque souvent des profils quantitatifs. » On sait à quoi s'attendre.</p></div>
+</div>
+<div id="pm-next" style="display:none;">
+<p class="sub" id="pm-next-line">Ton profil est enregistré, tu es désormais trouvable par les autres membres.</p>
+<div class="cta-row left"><a class="btn accent" id="pm-see-public" href="#">Voir ma fiche telle que les autres la voient</a><a class="btn secondary" href="membres.html">Parcourir l'annuaire des membres</a></div>
+</div>
+<div class="id-card" id="pm-notif-card" style="display:none;margin-top:34px;">
+<h2 style="font-size:clamp(19px,2.4vw,26px);margin:0 0 12px;">Notifications par e-mail</h2>
+<label for="pm-notif" style="display:flex;gap:10px;align-items:center;text-transform:none;letter-spacing:0;font-size:15px;font-weight:700;color:var(--ink);margin:0;"><input type="checkbox" id="pm-notif" style="width:auto;margin:0;flex:0 0 auto;"><span>Recevoir un e-mail pour les événements importants</span></label>
+<p class="field-hint">Nouvelle candidature, candidature acceptée ou refusée, nouveau message (au plus un e-mail par heure et par personne), réaction à une ouverture, confirmation d’une collaboration. Aucune publicité, aucune lettre d’information.</p>
+<p class="field-hint" id="pm-notif-state" style="margin-bottom:0;"></p>
+</div>
+</div>
+</main>
+<div id="pm-footer"></div>
+<script src="outils/supabase-js-2.117.1.js"></script>
+<script src="app.js"></script>
+<script>
+const msgEl=document.getElementById("pm-msg");const form=document.getElementById("pm-form");const submitBtn=document.getElementById("pm-submit");const typeEl=document.getElementById("pm-account-type");let session=null;
+function el(id){return document.getElementById(id);}
+function applyType(){
+const org=typeEl.value==="institution";
+el("pm-org-fields").style.display=org?"block":"none";
+el("pm-university-field").style.display=org?"none":"block";
+el("pm-availability-field").style.display=org?"none":"block";
+el("pm-example-person").style.display=org?"none":"block";
+el("pm-example-org").style.display=org?"block":"none";
+el("pm-compare-person").style.display=org?"none":"grid";
+el("pm-compare-org").style.display=org?"grid":"none";
+el("pm-page-title").textContent=org?"Notre fiche institution":"Mon profil";
+el("pm-page-sub").textContent=org?"C’est la carte de visite de votre structure : ce que vous faites, qui vous accueillez, et ce que vous cherchez. Elle est lue par des étudiants qui hésitent à candidater, donc soyez concrets.":"C’est ta carte de visite ici : ta discipline, ce que tu sais faire, ce que tu cherches. Sois précis, c’est exactement ce qui te rendra trouvable par quelqu’un d’une autre filière.";
+el("pm-label-name").textContent=org?"Nom de la structure":"Nom complet";
+el("pm-name").placeholder=org?"Laboratoire d’écologie des sols, Université de Lorraine":"Camille Diallo";
+el("pm-label-discipline").textContent=org?"Domaines de travail":"Discipline ou domaine";
+el("pm-discipline").placeholder=org?"Écologie du sol, biostatistiques":"Écologie, Statistiques, Design, Droit...";
+el("pm-label-bio").textContent=org?"Présentation de la structure":"Présentation";
+el("pm-bio").placeholder=org?"Votre taille, votre sujet, qui vous accueillez habituellement, et les profils qui vous manquent.":"Ce que tu étudies, ce que tu sais faire, et surtout ce qui te manque pour avancer.";
+el("pm-hint-bio").textContent=org?"Trois à quatre phrases. Le plus utile : dire quels profils vous manquent, et ce qu’un stagiaire y apprend.":"Deux à trois phrases suffisent. Le plus utile : dire clairement ce qui te bloque.";
+el("pm-label-skills").textContent=org?"Compétences présentes chez vous (séparées par des virgules)":"Compétences (séparées par des virgules)";
+el("pm-skills").placeholder=org?"terrain, séquençage, SIG, biostatistiques":"R, statistiques bayésiennes, terrain, cartographie";
+el("pm-submit").textContent=org?"Enregistrer notre fiche":"Enregistrer mon profil";
+}
+function fillForm(p){if(!p)return;typeEl.value=p.account_type||"personne";applyType();el("pm-name").value=p.full_name||"";el("pm-discipline").value=p.discipline||"";el("pm-university").value=p.university||"";el("pm-bio").value=p.bio||"";el("pm-skills").value=(p.skills||[]).join(", ");el("pm-availability").value=p.availability||"";el("pm-org-kind").value=p.org_kind||"";el("pm-contact-name").value=p.contact_name||"";el("pm-country").value=p.country||"";el("pm-website").value=p.website||"";}
+typeEl.addEventListener("change",applyType);
+form.addEventListener("submit",async function(e){e.preventDefault();pmShowMessage(msgEl,"");submitBtn.disabled=true;
+const org=typeEl.value==="institution";
+const skills=el("pm-skills").value.split(",").map(function(s){return s.trim();}).filter(Boolean);
+const payload={id:session.user.id,account_type:typeEl.value,full_name:el("pm-name").value.trim(),discipline:el("pm-discipline").value.trim()||null,bio:el("pm-bio").value.trim()||null,skills:skills,
+university:org?null:(el("pm-university").value.trim()||null),
+availability:org?null:(el("pm-availability").value.trim()||null),
+org_kind:org?(el("pm-org-kind").value||null):null,
+contact_name:org?(el("pm-contact-name").value.trim()||null):null,
+country:org?(el("pm-country").value.trim()||null):null,
+website:org?(el("pm-website").value.trim()||null):null};
+const r=await client.from("profiles").upsert(payload);submitBtn.disabled=false;
+if(r.error){pmShowMessage(msgEl,r.error.message,"error");return;}
+pmShowMessage(msgEl,org?"Fiche institution enregistrée.":"Profil enregistré.","ok");
+el("pm-next-line").textContent=org?"Votre fiche est enregistrée. Vos appels apparaîtront dans l’onglet Institutions de la page Projets.":"Ton profil est enregistré, tu es désormais trouvable par les autres membres.";
+el("pm-next").style.display="block";});
+function setupNotif(profile){
+var card=el("pm-notif-card");var box=el("pm-notif");var state=el("pm-notif-state");
+if(!profile){card.style.display="none";return;}
+card.style.display="block";
+box.checked=profile.email_notifications!==false;
+box.addEventListener("change",async function(){
+var want=box.checked;box.disabled=true;state.textContent=pmT("Enregistrement…");
+var r=await client.from("profiles").update({email_notifications:want}).eq("id",session.user.id).select("email_notifications");
+box.disabled=false;
+if(r.error||!r.data||r.data.length===0){box.checked=!want;state.textContent=pmT("Le réglage n’a pas pu être enregistré. Réessayer dans un instant.");return;}
+state.textContent=want?pmT("E-mails activés."):pmT("E-mails coupés. Tout continue d’arriver sur le site.");});}
+(async function(){session=await pmInitNav("profil.html");if(!session){window.location.href="connexion.html?next=profil.html";return;}
+const profile=await pmGetProfile(session.user.id);
+fillForm(profile);
+if(!profile)applyType();
+setupNotif(profile);
+const pubHref="profil-public.html?id="+session.user.id;
+const seeBtn=el("pm-see-public");if(seeBtn)seeBtn.setAttribute("href",pubHref);
+if(profile){const line=el("pm-public-line");line.innerHTML='Ta fiche est déjà visible par les autres membres : <a class="author-link" href="'+pubHref+'">la voir comme ils la voient</a>, ou la retrouver parmi <a class="author-link" href="membres.html">les autres membres</a>.';line.style.display="block";}})();
+</script>
+<script src="outils/compte.js"></script>
+</body>
+</html>

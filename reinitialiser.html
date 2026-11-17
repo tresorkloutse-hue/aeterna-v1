@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Réinitialiser le mot de passe : Polymatch</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#136577">
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<a class="pm-skip" href="#contenu">Aller au contenu</a>
+<div id="pm-nav"></div>
+<main id="contenu" tabindex="-1">
+<div class="wrap narrow hero">
+<span class="eyebrow">Compte</span>
+<h1>Choisir un nouveau mot de passe</h1>
+<p class="sub">Ce lien vient de ton email de réinitialisation. Il n'est valable qu'une seule fois.</p>
+</div>
+<div class="wrap narrow">
+<div id="pm-msg" class="msg-box" style="display:none;"></div>
+<form class="card" id="pm-form" style="display:none;">
+<label for="pm-password">Nouveau mot de passe</label>
+<input type="password" id="pm-password" required minlength="10" autocomplete="new-password">
+<p class="field-hint">10 caractères minimum. Évite un mot de passe que tu utilises déjà ailleurs : s’il a fuité sur un autre site, il ne protège plus rien ici. Une phrase courte que toi seul peux écrire vaut mieux qu’un mot compliqué.</p>
+<div class="form-actions"><button type="submit" class="btn accent" id="pm-submit">Enregistrer le mot de passe</button></div>
+</form>
+</div>
+</main>
+<div id="pm-footer"></div>
+<script src="outils/supabase-js-2.117.1.js"></script>
+<script src="app.js"></script>
+<script>
+const msgEl=document.getElementById("pm-msg");const form=document.getElementById("pm-form");const submitBtn=document.getElementById("pm-submit");
+form.addEventListener("submit",async(e)=>{e.preventDefault();pmShowMessage(msgEl,"");submitBtn.disabled=true;const password=document.getElementById("pm-password").value;const{error}=await client.auth.updateUser({password});submitBtn.disabled=false;if(error){pmShowMessage(msgEl,error.message,"error");return;}pmShowMessage(msgEl,"Mot de passe mis à jour. Tu es connecté.","ok");form.style.display="none";setTimeout(()=>{window.location.href="profil.html";},1500);});
+let resolved=false;function reveal(){if(resolved)return;resolved=true;form.style.display="block";pmShowMessage(msgEl,"");}
+client.auth.onAuthStateChange((event)=>{if(event==="PASSWORD_RECOVERY"||event==="SIGNED_IN"){reveal();}});
+(async()=>{await pmInitNav(null);for(let i=0;i<10&&!resolved;i++){const session=await pmGetSession();if(session){reveal();break;}await new Promise((r)=>setTimeout(r,300));}if(!resolved){pmShowMessage(msgEl,"Ce lien n'est plus valide ou a déjà été utilisé. Redemande une réinitialisation depuis la page de connexion.","error");}})();
+</script>
+</body>
+</html>

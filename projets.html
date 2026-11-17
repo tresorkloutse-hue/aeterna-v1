@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Projets et appels : Polymatch</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Les projets d'étudiants et de chercheurs, et les appels des institutions."><link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#136577">
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<a class="pm-skip" href="#contenu">Aller au contenu</a>
+<div id="pm-nav"></div>
+<main id="contenu" tabindex="-1">
+<div class="wrap wide hero">
+<span class="eyebrow">Fiches projet</span>
+<h1>Projets ouverts et appels</h1>
+<p class="sub">Deux choses différentes cohabitent ici, et on ne les mélange pas. D'un côté les projets portés par des personnes, qui cherchent un binôme hors de leur filière. De l'autre les appels des institutions : stages, thèses, missions, avec un cadre, des places et une date limite.</p>
+<div class="badges">
+<div class="badge-box">Postuler est gratuit</div>
+<div class="badge-box">Hors de ta filière, c'est l'idée</div>
+<div class="badge-box">Espace partagé dès l'acceptation</div>
+<div class="badge-box">À deux ou jusqu’à six</div>
+</div>
+</div>
+
+<div class="wrap wide">
+<div class="tabs">
+<button type="button" class="tab-btn current" data-tab="personne">Projets d'étudiants et de chercheurs<span class="tab-count" id="pm-count-personne"></span></button>
+<button type="button" class="tab-btn" data-tab="institution">Appels des institutions<span class="tab-count" id="pm-count-institution"></span></button>
+</div>
+<p class="tab-intro" id="pm-tab-intro">Une personne publie un travail en cours et nomme ce qui lui manque. Tu postules, et si c'est accepté un espace de travail partagé s'ouvre. Un projet peut réunir jusqu’à six personnes.</p>
+</div>
+
+<div id="pm-view-personne">
+<div class="band">
+<div class="wrap wide">
+<div class="duo">
+<div class="duo-img"><img src="images/projets-groupe.jpg" width="1100" height="619" alt="Groupe d'étudiants de disciplines différentes réunis autour d'un ordinateur portable" loading="lazy"></div>
+<div>
+<span class="eyebrow left">Comment publier un projet qui reçoit des candidatures</span>
+<h2>Trois étapes, et un exemple sous les yeux</h2>
+<ol class="steps">
+<li><strong>Dis ce que tu as.</strong> Des données, un terrain, un corpus, une première analyse.</li>
+<li><strong>Dis ce qui te bloque.</strong> C'est la partie la plus importante : nomme précisément la compétence qui te manque.</li>
+<li><strong>Dis combien de temps ça prend.</strong> Même approximatif, un cadre rassure et fait postuler.</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="wrap wide">
+<div class="example">
+<div class="ex-stamp">Exemple<br>fictif</div>
+<div class="ex-tag">Exemple de fiche projet remplie, champ par champ</div>
+<h3 style="font-size:18px;margin:0 0 8px;">Modéliser la propagation d'une rumeur dans un petit réseau étudiant</h3>
+<div class="ex-label">Description</div>
+<p class="ex-field">J'ai collecté environ 4 000 messages échangés dans les groupes d'une association étudiante sur un semestre, anonymisés. J'observe que certaines informations circulent très vite et d'autres pas du tout, mais je n'ai pas les outils mathématiques pour modéliser ça proprement. Je cherche quelqu'un à l'aise avec les modèles de diffusion ou la théorie des graphes, même sans aucune expérience du terrain associatif : je m'occupe du contexte et de l'interprétation sociologique.</p>
+<div class="ex-label">Ta discipline</div>
+<p class="ex-field">Sociologie</p>
+<div class="ex-label">Compétences recherchées</div>
+<p class="ex-field">théorie des graphes, Python, modélisation de diffusion</p>
+<div class="ex-label">Durée estimée</div>
+<p class="ex-field">environ 6 semaines, quelques heures par semaine</p>
+<div class="ex-note">La phrase qui fait postuler, c’est « je n’ai pas les outils mathématiques ». Nomme ce qui te manque, pas seulement ce que tu sais.</div>
+<div class="ex-meta">Rédaction fictive, fournie comme modèle.</div>
+</div>
+<div class="compare">
+<div class="compare-col bad"><div class="c-head">Titre à éviter</div><p>« Recherche partenaire pour projet de recherche » : on ne sait ni sur quoi, ni pour quoi faire.</p></div>
+<div class="compare-col good"><div class="c-head">Titre qui fonctionne</div><p>« Modéliser la propagation d'une rumeur dans un petit réseau étudiant » : on comprend le sujet et ce qu'on vient y faire.</p></div>
+</div>
+</div>
+</div>
+
+<div id="pm-view-institution" style="display:none;">
+<div class="band">
+<div class="wrap wide">
+<div class="duo">
+<div class="duo-img"><img src="images/projets-tableau.jpg" width="1100" height="734" alt="Deux personnes devant un tableau blanc, l’une écrit en tenant son ordinateur portable ouvert, l’autre écoute" loading="lazy"></div>
+<div>
+<span class="eyebrow left">Publier un appel qui reçoit des candidatures</span>
+<h2>Un appel n’est pas un projet entre pairs</h2>
+<p>Il a un cadre administratif, un nombre de places, parfois une rémunération et presque toujours une date limite. Ces quatre éléments sont demandés au moment de la publication et affichés en haut de la fiche, pour qu’un étudiant sache immédiatement s’il est concerné.</p>
+<ol class="steps">
+<li><strong>Dites ce que vous avez déjà.</strong> Les données, le terrain, le matériel qui attend quelqu’un.</li>
+<li><strong>Dites quel profil vous cherchez, même hors de votre discipline.</strong> C’est ce qui fait candidater un étudiant qui n’aurait pas osé.</li>
+<li><strong>Donnez le cadre.</strong> Stage ou thèse, combien de places, rémunéré ou non, et jusqu’à quand.</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="wrap wide">
+<div class="inst-block">
+<div class="ex-stamp">Exemple<br>fictif</div>
+<div class="ex-tag">Exemple d'appel rempli, champ par champ</div>
+<div class="ex-label">Intitulé</div>
+<h3 style="font-size:18px;margin:2px 0 0;">Stage M2 : analyser trois ans de relevés de biodiversité des sols</h3>
+<div class="ex-label">Description</div>
+<p class="ex-field">Notre unité dispose de trois campagnes de relevés sur 40 parcelles agricoles, saisies mais jamais exploitées statistiquement. Nous cherchons un stagiaire de Master 2 venant des statistiques, de la data science ou de la géographie quantitative, pas nécessairement de l'écologie : l'encadrement scientifique est assuré de notre côté. Le travail consiste à nettoyer les données, tester des modèles mixtes et produire des cartes exploitables.</p>
+<div class="ex-label">Cadre, places, rémunération, date limite</div>
+<p class="ex-field">Stage · 2 places · indemnisé · candidatures jusqu'au 15 mars</p>
+<div class="ex-note">Ces quatre lignes se lisent en trois secondes. Sans elles, un étudiant ne sait pas s’il est concerné, et passe.</div>
+<div class="ex-meta">Exemple fictif. Les appels portent un badge Institution et sont regroupés dans cet onglet, jamais mélangés aux projets entre pairs.</div>
+</div>
+<div class="compare">
+<div class="compare-col bad"><div class="c-head">Appel qui ne recevra rien</div><p>« Le laboratoire recherche des stagiaires motivés pour ses projets en cours. » Aucun sujet, aucun cadre, aucune date : personne ne peut se projeter.</p></div>
+<div class="compare-col good"><div class="c-head">Appel qui fait candidater</div><p>« Voilà les données, voilà ce qu'il faut en faire, voilà le profil qu'on cherche même hors de notre discipline, deux places, indemnisé, réponse avant le 15 mars. »</p></div>
+</div>
+</div>
+</div>
+
+<div class="wrap wide">
+<div id="pm-publish-zone"></div>
+<div id="pm-msg" class="msg-box" style="display:none;"></div>
+<h2 class="section-title" id="pm-list-title">Les projets en ligne</h2>
+<div class="pm-filters" id="pm-filters" style="display:none;">
+<label class="pm-filters-label" for="pm-q">Chercher</label>
+<input type="search" id="pm-q" placeholder="Un mot du titre, une discipline, une compétence" autocomplete="off">
+<label class="pm-filters-label" for="pm-disc">Discipline</label>
+<select id="pm-disc"><option value="">Toutes les disciplines</option></select>
+<button type="button" class="btn secondary small" id="pm-reset">Effacer</button>
+<p class="pm-filters-note" id="pm-filters-note" role="status"></p>
+</div>
+<div class="grid" id="pm-list-personne"><p class="empty-note">Chargement…</p></div>
+<div class="grid" id="pm-list-institution" style="display:none;"><p class="empty-note">Chargement…</p></div>
+<div class="pm-more" id="pm-more-personne"></div>
+<div class="pm-more" id="pm-more-institution" style="display:none;"></div>
+</div>
+</main>
+<div id="pm-footer"></div>
+<script src="outils/supabase-js-2.117.1.js"></script>
+<script src="app.js"></script>
+<script>
+const msgEl=document.getElementById("pm-msg");const publishZone=document.getElementById("pm-publish-zone");
+let session=null;let profile=null;let rows=[];let tab="personne";
+function el(id){return document.getElementById(id);}
+const INTROS={personne:"Une personne publie un travail en cours et nomme ce qui lui manque. Tu postules, et si c’est accepté un espace de travail partagé s’ouvre. Un projet peut réunir jusqu’à six personnes.",institution:"Une institution publie un appel encadré : stage, thèse, mission ou bénévolat, avec un nombre de places et une date limite de candidature. La procédure reste la même : tu postules depuis la fiche."};
+
+function cardHtml(p){
+const owner=pmAuthorLink(p.owner_id,p.profiles&&p.profiles.full_name);
+const inst=p.owner_type==="institution";
+const tags=(p.skills_needed||[]).map(function(s){return '<span class="tag">'+pmEscape(s)+"</span>";}).join("");
+const meta=inst?[p.discipline,pmFormatDate(p.created_at)].filter(Boolean):[p.discipline,p.duration,pmFormatDate(p.created_at)].filter(Boolean);
+return '<div class="project-row'+(inst?" inst":"")+'">'
++(inst?'<div><span class="org-badge">Institution</span></div>':"")
++'<a class="title-link" href="projet.html?id='+p.id+'">'+pmEscape(p.title)+"</a>"
++'<div class="meta">Par '+owner+(meta.length?" · "+meta.map(pmEscape).join(" · "):"")+"</div>"
++pmInstFacts(p)
++(tags?'<div class="tags">'+tags+"</div>":"")+"</div>";
+}
+
+const PAGE=12;
+let shown={personne:PAGE,institution:PAGE};
+let query="";let disc="";
+
+function pmFold(s){return (s||"").toString().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");}
+
+function matchesFilters(p){
+if(disc&&(p.discipline||"")!==disc)return false;
+if(!query)return true;
+const hay=pmFold([p.title,p.description,p.discipline,p.duration,p.framework,p.compensation,(p.skills_needed||[]).join(" "),p.profiles&&p.profiles.full_name].filter(Boolean).join(" "));
+return query.split(/\s+/).every(function(w){return hay.indexOf(w)>=0;});
+}
+
+function renderLists(){
+const filtering=!!(query||disc);
+el("pm-filters").style.display=session&&rows.length?"":"none";
+["personne","institution"].forEach(function(kind){
+const host=el("pm-list-"+kind);const more=el("pm-more-"+kind);
+const all=rows.filter(function(p){return (p.owner_type||"personne")===kind;});
+const subset=all.filter(matchesFilters);
+el("pm-count-"+kind).textContent=session?(" "+all.length):"";
+more.innerHTML="";
+if(!session){host.innerHTML='<p class="empty-note"><a href="connexion.html?next=projets.html">Connecte-toi</a> pour voir les publications : elles sont réservées aux membres.</p>';return;}
+if(all.length===0){host.innerHTML=kind==="personne"?'<p class="empty-note">Aucun projet publié pour l’instant. Sois le premier : inspire-toi de l’exemple ci-dessus.</p>':'<p class="empty-note">Aucun appel d’institution pour l’instant. Si tu représentes une structure, bascule ton compte en institution depuis <a href="profil.html">ta fiche</a> pour publier ici.</p>';return;}
+if(subset.length===0){host.innerHTML='<p class="empty-note">'+pmT("Aucun résultat pour cette recherche. Essaie un autre mot, ou efface le filtre.")+"</p>";return;}
+const page=subset.slice(0,shown[kind]);
+host.innerHTML=page.map(cardHtml).join("");
+if(subset.length>page.length){
+const reste=subset.length-page.length;
+const texte=reste===1
+?pmT(kind==="personne"?"Voir le dernier projet":"Voir le dernier appel")
+:pmT(kind==="personne"?"Voir plus de projets ({n} restants)":"Voir plus d’appels ({n} restants)").replace("{n}",reste);
+more.innerHTML='<button type="button" class="btn secondary" data-more="'+kind+'">'+texte+"</button>";
+}
+});
+const actifs=rows.filter(function(p){return (p.owner_type||"personne")===tab;});
+const gardes=actifs.filter(matchesFilters);
+el("pm-filters-note").textContent=filtering?pmT("{n} sur {t} affichés.").replace("{n}",Math.min(gardes.length,shown[tab])).replace("{t}",actifs.length):"";
+}
+
+function fillDisciplines(){
+const sel=el("pm-disc");const avant=sel.value;
+const noms=[];rows.forEach(function(p){const d=(p.discipline||"").trim();if(d&&noms.indexOf(d)<0)noms.push(d);});
+noms.sort(function(a,b){return a.localeCompare(b,"fr");});
+while(sel.options.length>1)sel.remove(1);
+noms.forEach(function(d){const o=document.createElement("option");o.value=d;o.textContent=d;sel.appendChild(o);});
+sel.value=noms.indexOf(avant)>=0?avant:"";
+disc=sel.value;
+}
+
+function appliquerFiltres(){
+query=pmFold(el("pm-q").value).trim();
+disc=el("pm-disc").value;
+shown={personne:PAGE,institution:PAGE};
+renderLists();
+}
+
+function setTab(kind){
+tab=kind;
+document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.toggle("current",b.getAttribute("data-tab")===kind);});
+el("pm-view-personne").style.display=kind==="personne"?"block":"none";
+el("pm-view-institution").style.display=kind==="institution"?"block":"none";
+el("pm-list-personne").style.display=kind==="personne"?"grid":"none";
+el("pm-list-institution").style.display=kind==="institution"?"grid":"none";
+el("pm-more-personne").style.display=kind==="personne"?"":"none";
+el("pm-more-institution").style.display=kind==="institution"?"":"none";
+el("pm-q").placeholder=pmT(kind==="personne"?"Un mot du titre, une discipline, une compétence":"Un mot de l’appel, une discipline, un cadre");
+el("pm-tab-intro").textContent=pmT(INTROS[kind]);
+el("pm-list-title").textContent=pmT(kind==="personne"?"Les projets en ligne":"Les appels en ligne");
+renderPublishZone();renderLists();
+}
+
+async function loadRows(){
+if(!session){rows=[];renderLists();return;}
+const r=await client.from("projects").select("id,title,description,discipline,skills_needed,duration,status,created_at,owner_id,owner_type,framework,places,compensation,deadline,profiles(full_name)").eq("status","open").order("created_at",{ascending:false});
+if(r.error){pmShowMessage(msgEl,pmT("Erreur de chargement : {m}").replace("{m}",r.error.message),"error");rows=[];fillDisciplines();renderLists();return;}
+rows=r.data||[];fillDisciplines();renderLists();
+}
+
+function renderPublishZone(){
+if(!session){publishZone.innerHTML='<div class="id-card"><p class="empty-note"><a href="connexion.html?next=projets.html">Crée un compte ou connecte-toi</a> pour publier. C’est gratuit.</p></div>';return;}
+if(!profile){publishZone.innerHTML='<div class="id-card"><p class="empty-note"><a href="profil.html">Complète d’abord ta fiche</a> : les autres membres doivent savoir qui tu es avant de te répondre.</p></div>';return;}
+const org=pmIsOrg(profile);
+if(tab!== (org?"institution":"personne")){
+publishZone.innerHTML='<div class="id-card"><p class="empty-note">'+(org?"Votre compte est une institution : vos publications vont dans l’onglet Appels des institutions.":"Ton compte est un compte personne : tes publications vont dans l’onglet Projets d’étudiants et de chercheurs. Pour publier un appel encadré, il faut un compte institution, modifiable depuis <a href=\"profil.html\">ta fiche</a>.")+"</p></div>";
+return;}
+publishZone.innerHTML='<div class="cta-row left"><button class="btn accent" id="pm-toggle-form">'+(org?"Publier un appel":"Publier mon projet")+'</button></div>'
++'<form class="card" id="pm-form" style="display:none;">'
++'<label for="pm-title">'+(org?"Intitulé de l’appel":"Titre du projet")+'</label><input type="text" id="pm-title" required placeholder="'+(org?"Stage M2 : analyser trois ans de relevés de biodiversité des sols":"Modéliser la propagation d’une rumeur dans un petit réseau étudiant")+'">'
++'<p class="field-hint">'+(org?"Mettez le cadre dans le titre : « Stage M2 », « Thèse », « Mission », puis le sujet.":"Un titre qui dit le sujet, pas « recherche partenaire ».")+'</p>'
++'<label for="pm-description">Description</label><textarea id="pm-description" required placeholder="'+(org?"Ce que vous avez, ce qu’il faut en faire, le profil recherché même hors de votre discipline, et l’encadrement prévu.":"Ce que tu as déjà (données, terrain, analyse), ce qui te bloque précisément, et ce que la personne apporterait.")+'"></textarea>'
++'<p class="field-hint"><button type="button" class="btn secondary small" id="pm-ai-suggest">Développer avec l’assistant IA</button></p><div id="pm-ai-suggest-zone" style="display:none;"></div>'
++'<label for="pm-discipline">'+(org?"Domaine du travail":"Ta discipline")+'</label><input type="text" id="pm-discipline" placeholder="'+(org?"Écologie du sol":"Sociologie")+'">'
++'<label for="pm-skills">Compétences recherchées (séparées par des virgules)</label><input type="text" id="pm-skills" placeholder="'+(org?"statistiques, R, SIG":"théorie des graphes, Python, modélisation")+'">'
++(org
+? '<label for="pm-framework">Cadre</label><select id="pm-framework"><option value="">À préciser</option><option value="stage">Stage</option><option value="these">Thèse</option><option value="mission">Mission</option><option value="benevolat">Bénévolat</option><option value="autre">Autre cadre</option></select>'
+ +'<label for="pm-places">Nombre de places</label><input type="text" id="pm-places" inputmode="numeric" placeholder="2">'
+ +'<label for="pm-compensation">Rémunération</label><select id="pm-compensation"><option value="">À préciser</option><option value="remunere">Rémunéré</option><option value="indemnise">Indemnisé</option><option value="benevole">Bénévole</option></select>'
+ +'<label for="pm-deadline">Date limite de candidature</label><input type="date" id="pm-deadline">'
+ +'<label for="pm-duration">Durée</label><input type="text" id="pm-duration" placeholder="6 mois, à partir de février">'
+ +'<p class="field-hint">Ces quatre informations sont affichées en haut de la fiche : c’est ce qu’un étudiant regarde en premier.</p>'
+: '<label for="pm-duration">Durée estimée</label><input type="text" id="pm-duration" placeholder="environ 6 semaines">')
++'<div class="form-actions"><button type="submit" class="btn accent" id="pm-submit">'+(org?"Publier l’appel":"Publier le projet")+'</button><button type="button" class="btn secondary" id="pm-cancel">Annuler</button></div></form>';
+
+el("pm-toggle-form").addEventListener("click",function(){el("pm-form").style.display="block";el("pm-toggle-form").style.display="none";});
+el("pm-cancel").addEventListener("click",function(){el("pm-form").style.display="none";el("pm-toggle-form").style.display="inline-block";});
+el("pm-ai-suggest").addEventListener("click",async function(){
+const descEl=el("pm-description");const zone=el("pm-ai-suggest-zone");const rough=descEl.value.trim();
+if(!rough){alert("Écris d’abord quelques mots sur ton besoin, l’assistant part de ça.");return;}
+const btn=el("pm-ai-suggest");btn.disabled=true;btn.textContent="L’assistant réfléchit...";zone.style.display="block";zone.innerHTML="";
+try{const s=await pmAiAssist("suggest_project",rough);const tags=Array.isArray(s.tags)?s.tags:[];
+zone.innerHTML='<div class="ai-result-box">'+pmEscape(s.description)+"</div>"+(tags.length?'<p class="field-hint">Compétences suggérées : '+tags.map(pmEscape).join(", ")+"</p>":"")+'<button type="button" class="btn accent small" id="pm-ai-use">Utiliser cette version</button>';
+el("pm-ai-use").addEventListener("click",function(){descEl.value=s.description;if(tags.length)el("pm-skills").value=tags.join(", ");zone.style.display="none";zone.innerHTML="";});
+}catch(e){zone.innerHTML='<div class="msg-box error">'+pmEscape(e.message)+"</div>";}
+finally{btn.disabled=false;btn.textContent="Développer avec l’assistant IA";}});
+
+el("pm-form").addEventListener("submit",async function(e){
+e.preventDefault();pmShowMessage(msgEl,"");
+const submitBtn=el("pm-submit");submitBtn.disabled=true;
+const skills=el("pm-skills").value.split(",").map(function(s){return s.trim();}).filter(Boolean);
+const payload={owner_id:session.user.id,title:el("pm-title").value.trim(),description:el("pm-description").value.trim(),discipline:el("pm-discipline").value.trim()||null,skills_needed:skills,duration:el("pm-duration").value.trim()||null};
+if(org){
+const n=parseInt(el("pm-places").value,10);
+payload.framework=el("pm-framework").value||null;
+payload.places=(isFinite(n)&&n>=1&&n<=100)?n:null;
+payload.compensation=el("pm-compensation").value||null;
+payload.deadline=el("pm-deadline").value||null;
+}
+const r=await client.from("projects").insert(payload);submitBtn.disabled=false;
+if(r.error){pmShowMessage(msgEl,r.error.message,"error");return;}
+pmShowMessage(msgEl,(org?"Appel publié.":"Projet publié.")+" Il apparaît désormais dans la liste ci-dessous.","ok");
+el("pm-form").reset();el("pm-form").style.display="none";el("pm-toggle-form").style.display="inline-block";
+loadRows();});
+}
+
+document.querySelectorAll(".tab-btn").forEach(function(b){b.addEventListener("click",function(){setTab(b.getAttribute("data-tab"));});});
+el("pm-q").addEventListener("input",appliquerFiltres);
+el("pm-disc").addEventListener("change",appliquerFiltres);
+el("pm-reset").addEventListener("click",function(){el("pm-q").value="";el("pm-disc").value="";appliquerFiltres();el("pm-q").focus();});
+document.addEventListener("click",function(e){
+const b=e.target.closest("[data-more]");if(!b)return;
+const kind=b.getAttribute("data-more");shown[kind]+=PAGE;renderLists();
+});
+(async function(){
+session=await pmInitNav("projets.html");
+if(session){profile=await pmGetProfile(session.user.id);}
+setTab(pmIsOrg(profile)?"institution":"personne");
+await loadRows();
+})();
+</script>
+</body>
+</html>
