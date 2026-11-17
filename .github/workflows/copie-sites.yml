@@ -13,9 +13,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - name: monrepetiteur
-        run: node scripts/snapshot.mjs https://monrepetiteur.vercel.app monrepetiteur/public /sw.js /manifest.webmanifest /icone.svg /photos/cahier.webp /photos/classe.webp /photos/nuit.webp
+        run: node scripts/snapshot.mjs https://monrepetiteur.vercel.app monrepetiteur/public /sw.js /manifest.webmanifest /icone.svg /photos/cahier.webp /photos/classe.webp /photos/nuit.webp 2>&1 | tee monrepetiteur/copie.log; true
       - name: clipper-pro
-        run: node scripts/snapshot.mjs https://clipper-pro-psi.vercel.app clipper-pro/public /app.css /js/asr-worker.js /js/captions.js /js/cover.js /js/db.js /js/detect.js /js/export.js /js/live.js /js/main.js /js/media.js /js/mix.js /js/music.js /js/panels.js /js/render.js /js/shared.js /js/state.js /js/subs.js /js/track.js /js/viral.js
+        run: node scripts/snapshot.mjs https://clipper-pro-psi.vercel.app clipper-pro/public /app.css /js/asr-worker.js /js/captions.js /js/cover.js /js/db.js /js/detect.js /js/export.js /js/live.js /js/main.js /js/media.js /js/mix.js /js/music.js /js/panels.js /js/render.js /js/shared.js /js/state.js /js/subs.js /js/track.js /js/viral.js 2>&1 | tee clipper-pro/copie.log; true
       - name: Enregistrer la copie
         run: |
           git config user.name "github-actions[bot]"
